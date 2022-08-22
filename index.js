@@ -1,7 +1,17 @@
 import fetch from 'node-fetch';
 import { accounts, database } from './data.js';
 import fs from 'fs';
-import 'colors';
+import { Logger } from 'tslog';
+
+new Logger( {
+	name: 'console',
+	overwriteConsole: true,
+	type: 'pretty',
+	displayDateTime: false,
+	displayLoggerName: false,
+	displayFilePath: 'hidden',
+	displayFunctionName: false,
+} );
 
 const csv_file = 'ouranos_working_bot.csv';
 
@@ -53,7 +63,7 @@ function getDate() {
 		} );
 		
 		/* For each account, set up a DB row, and add it to the data array */
-		console.log( '*** Database setup ***'.blue );
+		console.info( '*** Database setup ***' );
 		const data = await Promise.all( accounts.map( async (account, id) => {
 			
 			query = `SELECT * FROM ${table} WHERE  id='${account.id}'`;
@@ -63,10 +73,10 @@ function getDate() {
 			if (!res.rows.length) {
 				const backup = database_bak.find( obj => obj.id === account.id );
 				if (backup) {
-					console.log( `Row ${accounts[id].id} is empty, backup recovery` );
+					console.warn( `Row ${accounts[id].id} is empty, backup recovery` );
 					query = `INSERT INTO ${table} VALUES ('${account.id}', ${backup.money_total}, ${backup.money}, ${backup.money_mean}, ${backup.total_days_count}, ${backup.count_total}, ${backup.count}, ${backup.count_mean}, ${backup.error}, '${backup.date}')`;
 				} else {
-					console.log( `Row ${accounts[id].id} is empty, init a new row` );
+					console.warn( `Row ${accounts[id].id} is empty, init a new row` );
 					query = `INSERT INTO ${table} VALUES ('${account.id}', 0, 0, 0, 0, 0, 0, 0, 0, 0)`;
 				}
 				await database.query( query );
@@ -77,7 +87,7 @@ function getDate() {
 			return res.rows[0];
 		} ) );
 		
-		console.log( data );
+		console.debug( data );
 		
 		async function save_data(data, id) {
 			/**
@@ -102,7 +112,7 @@ function getDate() {
 				`;
 				await database.query( query );
 			} catch (e) {
-				console.log( e );
+				console.error( e );
 			}
 		}
 		
@@ -119,7 +129,7 @@ function getDate() {
 		
 		let main_account;
 		accounts.forEach( account => {if (account.pay === false) {return main_account = account;}} );
-		console.log( '*** Workers start-up ***'.blue );
+		console.info( '*** Workers start-up ***' );
 		accounts.map( (account, id) => {
 			
 			/* Pay */
@@ -140,7 +150,7 @@ function getDate() {
 			}
 		} );
 		
-		console.log( '*** Work result ***'.green.bold );
+		console.info( '*** Work result ***' );
 		
 		async function work(account, id) {
 			/**
@@ -220,12 +230,12 @@ function getDate() {
 					if (money && res.ok) {
 						data[id].money_total += money;
 						data[id].money += money;
-						console.log( `Id: ${account.id.bold.green} | Money: ${data[id].money} | Mean: ${data[id].money_mean} | Gain: ${money} | Count: ${data[id].count} | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
+						console.log( `Id: ${account.id} | Money: ${data[id].money} | Mean: ${data[id].money_mean} | Gain: ${money} | Count: ${data[id].count} | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
 						
 						setTimeout( () => work( account, id ), work_interval + cooldown * Math.random() );
 						
 					} else {
-						console.log( `${account.id.bold.red} failed, cooldown : ${retry / 6e4} mins ( OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Gain: ${money} | Error: ${data[id].error} | Date: ${getDate()} )` );
+						console.warn( `${account.id} failed, cooldown : ${retry / 6e4} mins ( OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Gain: ${money} | Error: ${data[id].error} | Date: ${getDate()} )` );
 						data[id].error += 1;
 						
 						setTimeout( () => work( account, id ), retry + cooldown * Math.random() );
@@ -233,7 +243,7 @@ function getDate() {
 					await save_data( data[id], account.id );
 				} );
 			} catch (e) {
-				console.log( 'Work has crashed'.red, e );
+				console.error( 'Work has crashed', e );
 				data[id].error += 1;
 				setTimeout( () => work( account, id ), retry + cooldown * Math.random() );
 			}
@@ -294,7 +304,7 @@ function getDate() {
 						} ) ).then( async money => {
 							
 							if (!money) {
-								console.log( `Id: ${payer.id.bold.red} | Money laundering cancelled : You got no money !` );
+								console.warn( `Id: ${payer.id.red} | Money laundering cancelled : You got no money !` );
 								setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
 								return;
 							}
@@ -319,11 +329,11 @@ function getDate() {
 							} ).then( res => {
 								
 								if (res.ok) {
-									console.log( `Id: ${payer.id.bold.green} | Money successfully laundered (${money.bold})` );
+									console.log( `Id: ${payer.id.green} | Money successfully laundered (${money})` );
 									setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
 									
 								} else {
-									console.log( `Id: ${payer.id.bold.red} | Money laundering failed, retry in ${retry / 6e4} mins` );
+									console.warn( `Id: ${payer.id.red} | Money laundering failed, retry in ${retry / 6e4} mins` );
 									setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
 								}
 								
@@ -331,17 +341,16 @@ function getDate() {
 						} );
 						
 					} else {
-						console.log( res.ok, res.status, res.statusText );
-						
+						console.error( `Fetching money failed | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
 					}
 				} );
 			} catch (e) {
-				console.log( 'Pay has crashed'.red, e );
+				console.error( 'Pay has crashed', e );
 				setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
 			}
 		} /* eof pay */
 		
 	} catch (e) {
-		console.log( e );
+		console.error( e );
 	}
 })();
