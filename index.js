@@ -39,7 +39,7 @@ function getDate() {
 		
 		let csv_data = fs.readFileSync( './csv/' + csv_file, 'utf8' )
 		console.log('csv_data', csv_data);
-		csv_data = csv_data.split( '\r\n' );
+		csv_data = csv_data.split( '\r' );
 		console.log('csv_data split', csv_data);
 		const keys = csv_data[0].replace( /"/g, '' ).split( ',' );
 		console.log('keys', keys);
@@ -51,7 +51,7 @@ function getDate() {
 			database_bak.push( {} );
 			line.split( ',' ).forEach( (item, i) => {
 				console.log('item', item);
-				database_bak[line_i][keys[i]] = item.replace( /"/g, '' );
+				database_bak[line_i][keys[i]] = item.replace( /"/g, '' ).replace( /\n/g, '' );
 			} );
 		} );
 		
