@@ -52,6 +52,7 @@ function getDate() {
 		} );
 		
 		/* For each account, set up a DB row, and add it to the data array */
+		console.log( '*** Database setup ***' );
 		const data = await Promise.all( accounts.map( async (account, id) => {
 			
 			query = `SELECT * FROM ${table} WHERE  id='${account.id}'`;
@@ -117,7 +118,7 @@ function getDate() {
 		
 		let main_account;
 		accounts.forEach( account => {if (account.pay === false) {return main_account = account;}} );
-		
+		console.log( '*** Workers start-up ***' );
 		accounts.map( (account, id) => {
 			
 			/* Pay */
@@ -138,6 +139,7 @@ function getDate() {
 			}
 		} );
 		
+		console.log( '*** Work result ***' );
 		
 		async function work(account, id) {
 			/**
