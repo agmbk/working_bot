@@ -136,9 +136,11 @@ function getDate() {
 		const
 			cooldown = 10 * 1e3,
 			one_hour = 3.6e6,
-			pay_interval = one_hour * 5,
+			one_minute = 6e4,
+			pay_interval = one_hour * 48,
 			work_interval = one_hour,
-			retry = one_hour / 12;
+			cant_c_me = one_hour / 2,
+			retry = one_minute * 5;
 		
 		/** Workers */
 		
@@ -150,8 +152,12 @@ function getDate() {
 			
 			if (wait_time > 0) {
 				const timeout = wait_time * 6e4 + cooldown * Math.random();
+				console.log( `${account.id} will works in ${wait_time.toFixed( 0 )} mins | Date: ${getDate()}` );
+				
 				work( account, id, timeout );
+				
 			} else {
+				console.log( `${account.id} will works now | Date: ${getDate()}` );
 				work( account, id, 0 );
 			}
 		} );
@@ -162,7 +168,7 @@ function getDate() {
 		accounts.map( (account, id) => {
 			if (account.pay) {
 				console.log( `${account.id} is paying ${main_account.id}` );
-				pay( account, main_account );
+				setTimeout( () => pay( account, main_account ), one_hour );
 			}
 		} );
 		
@@ -172,119 +178,124 @@ function getDate() {
 			/**
 			 * Work for each account, every hour
 			 */
-			const minutes = (timeout / 6e4).toFixed( 0 );
+			const ninja = cant_c_me * Math.random();
+			timeout += ninja;
+			console.log( timeout / one_hour );
+			await new Promise( resolve => setTimeout( resolve, timeout ) );
 			
-			console.log( `${account.id} will works ${minutes === '0' ? 'now' : `in ${minutes} mins`} | Date: ${getDate()}` );
-			
-			setTimeout( () => {
-				worker();
-			}, timeout );
-			
-			async function worker() {
-				try {
-					await fetch( 'https://discord.com/api/v9/interactions', {
-						'headers': {
-							'accept': '*/*',
-							'accept-language': 'fr,fr-FR;q=0.9',
-							'authorization': account.authorization,
-							'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryMcqN0DmNbQHonseA',
-							'sec-fetch-dest': 'empty',
-							'sec-fetch-mode': 'cors',
-							'sec-fetch-site': 'same-origin',
-							'x-debug-options': 'bugReporterEnabled',
-							'x-discord-locale': 'en-GB',
-							'x-fingerprint': '1010702419111460874.LzvOdL3jTREmOoBLHZQudC-bGV4',
-							'x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiRGlzY29yZCBDbGllbnQiLCJyZWxlYXNlX2NoYW5uZWwiOiJzdGFibGUiLCJjbGllbnRfdmVyc2lvbiI6IjEuMC45MDA2Iiwib3NfdmVyc2lvbiI6IjEwLjAuMjIwMDAiLCJvc19hcmNoIjoieDY0Iiwic3lzdGVtX2xvY2FsZSI6ImZyIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTQyODY4LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==',
-							'cookie': '__dcfduid=0c095750eae211ec9277b769df24b26a; __sdcfduid=0c095751eae211ec9277b769df24b26a78e0361b8f672f8cf7c211b13c347439284eab11bde79ecf445cdd901eadf5ec; __stripe_mid=55cdba8e-92b0-496c-8851-3025451e30e60d8f68; locale=en-GB',
-						},
-						'referrer': 'https://discord.com/channels/902947280162811975/905426507021811772',
-						'referrerPolicy': 'strict-origin-when-cross-origin',
-						'body': `------WebKitFormBoundaryMcqN0DmNbQHonseA\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n\r\n{\"type\":2,\"application_id\":\"952125649345196044\",\"guild_id\":\"902947280162811975\",\"channel_id\":\"905426507021811772\",\"session_id\":\"${account.session_id}\",\"data\":{\"version\":\"1001148798988472382\",\"id\":\"1001148798988472381\",\"guild_id\":\"902947280162811975\",\"name\":\"work\",\"type\":1,\"options\":[],\"attachments\":[]},\"nonce\":\"1010702591710986240\"}\r\n------WebKitFormBoundaryMcqN0DmNbQHonseA--\r\n`,
-						'method': 'POST',
-						'mode': 'cors',
-					} ).then( async res => {
-						/* To compare with the bot message timestamp */
-						const timestamp = new Date().setMilliseconds( -cooldown );
-						
-						/* Calculate mean of the day */
-						if (new Date( Date.parse( getDate() ) ).getDate() !== data[id].date.getDate()) {
-							data[id].date = new Date().getDay();
-							data[id].total_days_count += 1;
-							data[id].count_mean += ((data[id].count - data[id].count_mean) / data[id].total_days_count);
-							data[id].money_mean += ((data[id].money - data[id].money_mean) / data[id].total_days_count);
-							data[id].money = 0;
-							data[id].count = 0;
-						}
-						let money = 0;
-						if (res.ok) {
-							data[id].count += 1;
-							data[id].count_total += 1;
-							
-							/**
-							 * Fetch money gain
-							 */
-							await new Promise( resolve => setTimeout( resolve, cooldown / 2 ) );
-							money = await fetch( 'https://discord.com/api/v9/channels/905426507021811772/messages?limit=10', {
-								'headers': {
-									'accept': '*/*',
-									'accept-language': 'fr,fr-FR;q=0.9',
-									'authorization': account.authorization,
-									'sec-fetch-dest': 'empty',
-									'sec-fetch-mode': 'cors',
-									'sec-fetch-site': 'same-origin',
-									'x-debug-options': 'bugReporterEnabled',
-									'x-discord-locale': 'en-GB',
-								},
-								'referrer': 'https://discord.com/channels/902947280162811975/952558030556389466',
-								'referrerPolicy': 'strict-origin-when-cross-origin',
-								'body': null,
-								'method': 'GET',
-								'mode': 'cors',
-							} ).then( res => res.json().then( json => {
-								
-								/* Get the last message > timestamp - cooldown */
-								for (const message of json) {
-									if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
-										if (new Date( message.timestamp ).getTime() > timestamp) return parseInt( message.content.split( '**' )[1] );
-									}
-								}
-								return 0;
-								
-							} ) );
-						}
-						if (money && res.ok) {
-							data[id].money_total += money;
-							data[id].money += money;
-							
-							console.log( `Id: ${account.id.green()} | Money: ${data[id].money.toString().blue()} | Mean: ${data[id].money_mean} | Gain: ${money.toString().green()} | Count: ${data[id].count} | Date: ${getDate()}` );
-							
-							const timeout = work_interval + cooldown * Math.random();
-							await save_data( data[id], account.id );
-							await work( account, id, timeout );
-							
-						} else {
-							/* Probably invalid account */
-							console.warn( `${account.id.red()} failed ( ${resFormat()} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data[id].error} | Date: ${getDate()} )` );
-							data[id].error += 1;
-							
-							const timeout = retry + cooldown * Math.random();
-							await work( account, id, timeout );
-						}
-					} );
-				} catch (e) {
-					console.error( 'Work has crashed'.red(), e );
-					data[id].error += 1;
-					
-					const timeout = retry + cooldown * Math.random();
-					await work( account, id, timeout );
-				}
+			const hour = new Date( Date.parse( getDate() ) ).getHours();
+			if (2 < hour && hour < 7) {
+				await work( account, id, timeout );
 			}
+			
+			try {
+				await fetch( 'https://discord.com/api/v9/interactions', {
+					'headers': {
+						'accept': '*/*',
+						'accept-language': 'fr,fr-FR;q=0.9',
+						'authorization': account.authorization,
+						'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryMcqN0DmNbQHonseA',
+						'sec-fetch-dest': 'empty',
+						'sec-fetch-mode': 'cors',
+						'sec-fetch-site': 'same-origin',
+						'x-debug-options': 'bugReporterEnabled',
+						'x-discord-locale': 'en-GB',
+						'x-fingerprint': '1010702419111460874.LzvOdL3jTREmOoBLHZQudC-bGV4',
+						'x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiRGlzY29yZCBDbGllbnQiLCJyZWxlYXNlX2NoYW5uZWwiOiJzdGFibGUiLCJjbGllbnRfdmVyc2lvbiI6IjEuMC45MDA2Iiwib3NfdmVyc2lvbiI6IjEwLjAuMjIwMDAiLCJvc19hcmNoIjoieDY0Iiwic3lzdGVtX2xvY2FsZSI6ImZyIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTQyODY4LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==',
+						'cookie': '__dcfduid=0c095750eae211ec9277b769df24b26a; __sdcfduid=0c095751eae211ec9277b769df24b26a78e0361b8f672f8cf7c211b13c347439284eab11bde79ecf445cdd901eadf5ec; __stripe_mid=55cdba8e-92b0-496c-8851-3025451e30e60d8f68; locale=en-GB',
+					},
+					'referrer': 'https://discord.com/channels/902947280162811975/905426507021811772',
+					'referrerPolicy': 'strict-origin-when-cross-origin',
+					'body': `------WebKitFormBoundaryMcqN0DmNbQHonseA\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n\r\n{\"type\":2,\"application_id\":\"952125649345196044\",\"guild_id\":\"902947280162811975\",\"channel_id\":\"905426507021811772\",\"session_id\":\"${account.session_id}\",\"data\":{\"version\":\"1001148798988472382\",\"id\":\"1001148798988472381\",\"guild_id\":\"902947280162811975\",\"name\":\"work\",\"type\":1,\"options\":[],\"attachments\":[]},\"nonce\":\"1010702591710986240\"}\r\n------WebKitFormBoundaryMcqN0DmNbQHonseA--\r\n`,
+					'method': 'POST',
+					'mode': 'cors',
+				} ).then( async res => {
+					/* To compare with the bot message timestamp */
+					const timestamp = new Date().setMilliseconds( -cooldown );
+					
+					/* Calculate mean of the day */
+					if (new Date( Date.parse( getDate() ) ).getDate() !== data[id].date.getDate()) {
+						data[id].date = new Date().getDay();
+						data[id].total_days_count += 1;
+						data[id].count_mean += ((data[id].count - data[id].count_mean) / data[id].total_days_count);
+						data[id].money_mean += ((data[id].money - data[id].money_mean) / data[id].total_days_count);
+						data[id].money = 0;
+						data[id].count = 0;
+					}
+					let money = 0;
+					if (res.ok) {
+						data[id].count += 1;
+						data[id].count_total += 1;
+						
+						/**
+						 * Fetch money gain
+						 */
+						await new Promise( resolve => setTimeout( resolve, cooldown / 2 ) );
+						money = await fetch( 'https://discord.com/api/v9/channels/905426507021811772/messages?limit=10', {
+							'headers': {
+								'accept': '*/*',
+								'accept-language': 'fr,fr-FR;q=0.9',
+								'authorization': account.authorization,
+								'sec-fetch-dest': 'empty',
+								'sec-fetch-mode': 'cors',
+								'sec-fetch-site': 'same-origin',
+								'x-debug-options': 'bugReporterEnabled',
+								'x-discord-locale': 'en-GB',
+							},
+							'referrer': 'https://discord.com/channels/902947280162811975/952558030556389466',
+							'referrerPolicy': 'strict-origin-when-cross-origin',
+							'body': null,
+							'method': 'GET',
+							'mode': 'cors',
+						} ).then( res => res.json().then( json => {
+							
+							/* Get the last message > timestamp - cooldown */
+							for (const message of json) {
+								if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
+									if (new Date( message.timestamp ).getTime() > timestamp) return parseInt( message.content.split( '**' )[1] );
+								}
+							}
+							return 0;
+							
+						} ) );
+					}
+					if (money && res.ok) {
+						data[id].money_total += money;
+						data[id].money += money;
+						
+						console.log( `${account.id.green()} | Money: ${data[id].money.toString().blue()} | Mean: ${data[id].money_mean} | Gain: ${money.toString().green()} | Count: ${data[id].count} | Date: ${getDate()}` );
+						
+						const timeout = work_interval + cooldown * Math.random();
+						await save_data( data[id], account.id );
+						await work( account, id, timeout );
+						
+					} else {
+						console.warn( `${account.id.red()} failed ( ${resFormat( res )} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data[id].error} | Date: ${getDate()} )` );
+						data[id].error += 1;
+						
+						const timeout = retry + cooldown * Math.random();
+						await work( account, id, timeout );
+					}
+				} );
+			} catch (e) {
+				console.error( 'Work has crashed'.red(), e );
+				data[id].error += 1;
+				
+				const timeout = retry + cooldown * Math.random();
+				await work( account, id, timeout );
+			}
+			
 		} /* eof work */
 		
 		async function pay(payer, receiver) {
 			/**
 			 * Money laundering
 			 */
+			
+			const hour = new Date( Date.parse( getDate() ) ).getHours();
+			if (2 < hour && hour < 7) {
+				setTimeout( () => pay( payer, receiver ), pay_interval + cant_c_me * Math.random() );
+			}
 			try {
 				await fetch( 'https://discord.com/api/v9/interactions', {
 					'headers': {
@@ -307,7 +318,7 @@ function getDate() {
 					
 					if (res.ok) {
 						
-						await new Promise( resolve => setTimeout( resolve, cooldown / 2 ) );
+						await new Promise( resolve => setTimeout( resolve, 5e3 ) );
 						const messages = await fetch( 'https://discord.com/api/v9/channels/905426507021811772/messages?limit=10', {
 							'headers': {
 								'accept': '*/*',
@@ -334,7 +345,7 @@ function getDate() {
 								if (minutes < pay_interval / 6e4) {
 									console.warn( `${payer.id.green()} | Money laundered ${minutes} mins ago (${money.toString().green()})` );
 								}
-								setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
+								setTimeout( () => pay( payer, receiver ), pay_interval + cant_c_me * Math.random() );
 								return;
 							}
 						}
@@ -349,7 +360,7 @@ function getDate() {
 						
 						if (money === 0) {
 							console.warn( `${payer.id.red()} | Money laundering cancelled : ${'You got no money'.red()} !` );
-							setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
+							setTimeout( () => pay( payer, receiver ), pay_interval + cant_c_me * Math.random() );
 							return;
 						}
 						
@@ -375,22 +386,21 @@ function getDate() {
 								
 								if (res.ok) {
 									console.log( `${payer.id.green()} | Money successfully laundered (${money.toString().green()})` );
-									setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
 									
 								} else {
 									console.warn( `${payer.id.red()} | Money laundering failed, retry in ${retry / 6e4} mins` );
-									setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
 								}
+								setTimeout( () => pay( payer, receiver ), pay_interval + cant_c_me * Math.random() );
 							} );
 						}
 					}
 					/* Probably invalid account */
 					console.error( `Fetching money failed | ${resFormat( res )} | Date: ${getDate()}`.red() );
-					setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
+					setTimeout( () => pay( payer, receiver ), retry + cant_c_me * Math.random() );
 				} );
 			} catch (e) {
 				console.error( 'Pay has crashed'.red(), e );
-				setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
+				setTimeout( () => pay( payer, receiver ), retry + cant_c_me * Math.random() );
 			}
 		} /* eof pay */
 		
