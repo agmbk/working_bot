@@ -38,13 +38,17 @@ function getDate() {
 		/* Read the backup */
 		
 		let csv_data = fs.readFileSync( './csv/' + csv_file, 'utf8' ).replace( /"/g, '' ).split( '\r\n' );
+		console.log('csv_data', csv_data);
 		const keys = csv_data[0].split( ',' );
+		console.log('keys', keys);
 		const database_bak = [];
 		csv_data = csv_data.slice( 1 );
-		
+		console.log('csv_data slice', csv_data);
 		csv_data.forEach( (line, line_i) => {
+			console.log('line', line);
 			database_bak.push( {} );
 			line.split( ',' ).forEach( (item, i) => {
+				console.log('item', item);
 				database_bak[line_i][keys[i]] = item.replace('\n', '').replace('\r', '');
 			} );
 		} );
