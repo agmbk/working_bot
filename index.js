@@ -38,6 +38,7 @@ function getDate() {
 		/* Read the backup */
 		
 		let csv_data = fs.readFileSync( './csv/' + csv_file, 'utf8' ).replace( /"/g, '' ).split( '\r\n' );
+		console.log(csv_data);
 		const keys = csv_data[0].split( ',' );
 		const database_bak = [];
 		csv_data = csv_data.slice( 1 );
@@ -56,7 +57,7 @@ function getDate() {
 			query = `SELECT * FROM ${table} WHERE  id='${account.id}'`;
 			res = await database.query( query );
 			
-			/* Initiate the row if row doesn't exist */
+			/* Create the row if row doesn't exist */
 			if (!res.rows.length) {
 				const backup = database_bak.find( obj => obj.id === account.id );
 				if (backup) {
