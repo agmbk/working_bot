@@ -31,6 +31,10 @@ function getDate() {
 }
 
 (async function () {
+	function resFormat(res) {
+		return `OK: ${res.ok} | Status: ${res.status === 204 ? res.status.toString().green() : res.status.toString().red()} ${res.status === 204 ? res.statusText.toString().green() : res.statusText.toString().red()}`;
+	}
+	
 	try {
 		/** DB setup */
 		
@@ -136,22 +140,12 @@ function getDate() {
 			work_interval = one_hour,
 			retry = one_hour / 12;
 		
-		/* Workers */
-		
-		let main_account;
-		accounts.forEach( account => {if (account.pay === false) {return main_account = account;}} );
+		/** Workers */
 		
 		console.log( '*** Workers start-up ***'.blue() );
 		
+		/* Work */
 		accounts.map( (account, id) => {
-			
-			/* Pay */
-			if (account.pay) {
-				console.log( `${account.id} is paying ${main_account.id}` );
-				pay( account, main_account );
-			}
-			
-			/* Work */
 			const wait_time = 60 - (Date.parse( getDate() ) - data[id].date.getTime()) / 6e4;
 			
 			if (wait_time > 0) {
@@ -159,6 +153,16 @@ function getDate() {
 				work( account, id, timeout );
 			} else {
 				work( account, id, 0 );
+			}
+		} );
+		
+		/* Pay */
+		let main_account;
+		accounts.forEach( account => {if (account.pay === false) {return main_account = account;}} );
+		accounts.map( (account, id) => {
+			if (account.pay) {
+				console.log( `${account.id} is paying ${main_account.id}` );
+				pay( account, main_account );
 			}
 		} );
 		
@@ -252,14 +256,15 @@ function getDate() {
 							data[id].money_total += money;
 							data[id].money += money;
 							
-							console.log( `Id: ${account.id.green()} | Money: ${data[id].money.toString().blue()} | Mean: ${data[id].money_mean} | Gain: ${money.toString().green()} | Count: ${data[id].count} | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
+							console.log( `Id: ${account.id.green()} | Money: ${data[id].money.toString().blue()} | Mean: ${data[id].money_mean} | Gain: ${money.toString().green()} | Count: ${data[id].count} | Date: ${getDate()}` );
 							
 							const timeout = work_interval + cooldown * Math.random();
 							await save_data( data[id], account.id );
 							await work( account, id, timeout );
 							
 						} else {
-							console.warn( `${account.id.red()} failed ( OK: ${res.ok} | Status: ${res.status === 204 ? res.status.toString().green() : res.status.toString().red()} ${res.status === 204 ? res.statusText.toString().green() : res.statusText.toString().red()} | Gain: ${money === '0' ? money.toString().red() : money.toString().green()} | Error: ${data[id].error} | Date: ${getDate()} )` );
+							/* Probably invalid account */
+							console.warn( `${account.id.red()} failed ( ${resFormat()} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data[id].error} | Date: ${getDate()} )` );
 							data[id].error += 1;
 							
 							const timeout = retry + cooldown * Math.random();
@@ -327,7 +332,7 @@ function getDate() {
 								const minutes = ((Date.parse( getDate() ) - Date.parse( message.timestamp )) / 6e4).toFixed( 0 );
 								const money = parseInt( message.content.split( '**' )[1] );
 								if (minutes < pay_interval / 6e4) {
-									console.warn( `${payer.id.green()} | Money already laundered ${minutes} mins ago (${money.toString().green()})` );
+									console.warn( `${payer.id.green()} | Money laundered ${minutes} mins ago (${money.toString().green()})` );
 								}
 								setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
 								return;
@@ -336,14 +341,14 @@ function getDate() {
 						
 						/* Get money amount from messages */
 						let money;
-						for (const message of json) {
+						for (const message of messages) {
 							if (message.author.id === '952125649345196044' && message.interaction.user.id === payer.id && message.interaction.name === 'money') {
 								money = parseInt( message.content.split( '**' )[1] );
 							}
 						}
 						
 						if (money === 0) {
-							console.warn( `${payer.id} | Money laundering cancelled : ${'You got no money'.red()} !` );
+							console.warn( `${payer.id.red()} | Money laundering cancelled : ${'You got no money'.red()} !` );
 							setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
 							return;
 						}
@@ -379,7 +384,8 @@ function getDate() {
 							} );
 						}
 					}
-					console.error( `Fetching money failed | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}`.red() );
+					/* Probably invalid account */
+					console.error( `Fetching money failed | ${resFormat( res )} | Date: ${getDate()}`.red() );
 					setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
 				} );
 			} catch (e) {
