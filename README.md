@@ -42,3 +42,8 @@ This self bot sends `/works` every x hour to the Ouranos server (`bots-commandes
 - [x] Multiple account support for money laundering.
 - [x] Added auto-pay function to the main account.
 - [x] Added the fetch function to get the salary amount and calculate the global earnings.
+
+#### 22/08/2022
+
+- [x] Added recovery from backup file (csv).
+- [x] Databse improvement.
