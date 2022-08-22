@@ -139,7 +139,7 @@ function getDate() {
 			one_minute = 6e4,
 			pay_interval = one_hour * 48,
 			work_interval = one_hour,
-			cant_c_me = one_hour / 1,
+			cant_c_me = 0, //one_hour,
 			retry = one_minute * 5;
 		
 		/** Workers */
@@ -147,28 +147,31 @@ function getDate() {
 		console.log( '*** Workers start-up ***'.blue() );
 		
 		/* Work */
+		let main_account;
+		accounts.forEach( account => {if (account.pay === false) {return main_account = account;}} );
+		
 		accounts.map( (account, id) => {
-			const wait_time = 60 - (Date.parse( getDate() ) - data[id].date.getTime()) / one_minute;
-			
-			if (wait_time > 0) {
-				const timeout = wait_time * one_minute + cooldown * Math.random();
-				console.log( `${account.id} will works in ${wait_time.toFixed( 0 )} mins | Date: ${getDate()}` );
+			if (account.id === main_account.id) {
+				const wait_time = 60 - (Date.parse( getDate() ) - data[id].date.getTime()) / one_minute;
 				
-				work( account, id, timeout );
-				
-			} else {
-				console.log( `${account.id} will works now | Date: ${getDate()}` );
-				work( account, id, 0 );
+				if (wait_time > 0) {
+					const timeout = wait_time * one_minute + cooldown * Math.random();
+					console.log( `${account.id.cyan()} will works in ${wait_time.toFixed( 0 ).cyan()} mins | Date: ${getDate()}` );
+					
+					work( account, id, timeout );
+					
+				} else {
+					console.log( `${account.id.cyan()} will works now | Date: ${getDate()}` );
+					work( account, id, 0 );
+				}
 			}
 		} );
 		
 		/* Pay */
-		let main_account;
-		accounts.forEach( account => {if (account.pay === false) {return main_account = account;}} );
 		accounts.map( (account, id) => {
 			if (account.pay) {
-				console.log( `${account.id} is paying ${main_account.id}` );
-				setTimeout( () => pay( account, main_account ), one_hour );
+				console.log( `${account.id.cyan()} is paying ${main_account.id.cyan()}` );
+				// setTimeout( () => pay( account, main_account ), one_hour );
 			}
 		} );
 		
@@ -179,12 +182,17 @@ function getDate() {
 			 * Work for each account, every hour
 			 */
 			timeout += cant_c_me * Math.random();
-			console.log( 'Waiting', (timeout / one_minute).toFixed( 0 ), 'mins' );
+			console.log( 'Waiting', (timeout / one_minute).toFixed( 0 ).cyan(), 'mins' );
 			await new Promise( resolve => setTimeout( resolve, timeout ) );
 			
 			const hour = new Date( Date.parse( getDate() ) ).getHours();
 			if (2 < hour && hour < 7) {
-				await work( account, id, timeout );
+				if (Math.random() > 0.5) await work( account, id, timeout );
+			}
+			
+			/* Secondary accounts work 2 time less */
+			if (account.id !== main_account.id) {
+				if (Math.random() > 0.5) return;
 			}
 			
 			try {
@@ -203,7 +211,7 @@ function getDate() {
 						'x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiRGlzY29yZCBDbGllbnQiLCJyZWxlYXNlX2NoYW5uZWwiOiJzdGFibGUiLCJjbGllbnRfdmVyc2lvbiI6IjEuMC45MDA2Iiwib3NfdmVyc2lvbiI6IjEwLjAuMjIwMDAiLCJvc19hcmNoIjoieDY0Iiwic3lzdGVtX2xvY2FsZSI6ImZyIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTQyODY4LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==',
 						'cookie': '__dcfduid=0c095750eae211ec9277b769df24b26a; __sdcfduid=0c095751eae211ec9277b769df24b26a78e0361b8f672f8cf7c211b13c347439284eab11bde79ecf445cdd901eadf5ec; __stripe_mid=55cdba8e-92b0-496c-8851-3025451e30e60d8f68; locale=en-GB',
 					},
-					'referrer': 'https://discord.com/channels/902947280162811975/905426507021811772',
+					'referrer': `https://discord.com/channels/902947280162811975/905426507021811772`,
 					'referrerPolicy': 'strict-origin-when-cross-origin',
 					'body': `------WebKitFormBoundaryMcqN0DmNbQHonseA\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n\r\n{\"type\":2,\"application_id\":\"952125649345196044\",\"guild_id\":\"902947280162811975\",\"channel_id\":\"905426507021811772\",\"session_id\":\"${account.session_id}\",\"data\":{\"version\":\"1001148798988472382\",\"id\":\"1001148798988472381\",\"guild_id\":\"902947280162811975\",\"name\":\"work\",\"type\":1,\"options\":[],\"attachments\":[]},\"nonce\":\"1010702591710986240\"}\r\n------WebKitFormBoundaryMcqN0DmNbQHonseA--\r\n`,
 					'method': 'POST',
@@ -230,7 +238,7 @@ function getDate() {
 						 * Fetch money gain
 						 */
 						await new Promise( resolve => setTimeout( resolve, cooldown / 2 ) );
-						money = await fetch( 'https://discord.com/api/v9/channels/905426507021811772/messages?limit=10', {
+						money = await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {
 							'headers': {
 								'accept': '*/*',
 								'accept-language': 'fr,fr-FR;q=0.9',
@@ -310,7 +318,7 @@ function getDate() {
 					},
 					'referrer': 'https://discord.com/channels/902947280162811975/905426507021811772',
 					'referrerPolicy': 'strict-origin-when-cross-origin',
-					'body': `------WebKitFormBoundaryAAewkFPiiGspgS7p\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n\r\n{\"type\":2,\"application_id\":\"952125649345196044\",\"guild_id\":\"902947280162811975\",\"channel_id\":\"905426507021811772\",\"session_id\":\"${payer.session_id}\",\"data\":{\"version\":\"1000878143072120923\",\"id\":\"1000878143072120922\",\"guild_id\":\"902947280162811975\",\"name\":\"money\",\"type\":1,\"options\":[],\"attachments\":[]},\"nonce\":\"1011078265214861312\"}\r\n------WebKitFormBoundaryAAewkFPiiGspgS7p--`,
+					'body': `------WebKitFormBoundaryAAewkFPiiGspgS7p\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n\r\n{\"type\":2,\"application_id\":\"952125649345196044\",\"guild_id\":\"902947280162811975\",\"channel_id\":\"${905426507021811772}\",\"session_id\":\"${payer.session_id}\",\"data\":{\"version\":\"1000878143072120923\",\"id\":\"1000878143072120922\",\"guild_id\":\"902947280162811975\",\"name\":\"money\",\"type\":1,\"options\":[],\"attachments\":[]},\"nonce\":\"1011078265214861312\"}\r\n------WebKitFormBoundaryAAewkFPiiGspgS7p--`,
 					'method': 'POST',
 					'mode': 'cors',
 				} ).then( async res => {
@@ -394,7 +402,7 @@ function getDate() {
 						}
 					}
 					/* Probably invalid account */
-					console.error( `Fetching money failed | ${resFormat( res )} | Date: ${getDate()}`.red() );
+					console.error( `${payer.id.red()} fetching money failed | ${resFormat( res )} | Date: ${getDate()}` );
 					setTimeout( () => pay( payer, receiver ), retry + cant_c_me * Math.random() );
 				} );
 			} catch (e) {
@@ -404,7 +412,8 @@ function getDate() {
 		} /* eof pay */
 		
 	} catch (e) {
-		console.error( e );
+		/* Can be DB error */
+		console.error( 'GLOBAL CRASH'.red(), e );
 	}
 })();
 
