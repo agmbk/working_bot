@@ -40,20 +40,16 @@ function getDate() {
 		let csv_data = fs.readFileSync( './csv/' + csv_file, 'utf8' ).replace( /"/g, '' ).replace( /\r/g, '' ).split( '\n' );
 		
 		const keys = csv_data[0].split( ',' );
-		console.log( 'keys', keys );
-		const database_bak = [];
 		csv_data = csv_data.slice( 1 );
-		console.log( 'csv_data slice', csv_data );
+		
+		const database_bak = [];
 		csv_data.forEach( (line, line_i) => {
-			console.log( 'line', line );
+			
 			database_bak.push( {} );
 			line.split( ',' ).forEach( (item, i) => {
-				console.log( 'item', item );
 				database_bak[line_i][keys[i]] = item;
 			} );
 		} );
-		
-		console.log( database_bak );
 		
 		/* For each account, set up a DB row, and add it to the data array */
 		const data = await Promise.all( accounts.map( async (account, id) => {
@@ -69,7 +65,7 @@ function getDate() {
 					query = `INSERT INTO ${table} VALUES ('${account.id}', ${backup.money_total}, ${backup.money}, ${backup.money_mean}, ${backup.total_days_count}, ${backup.count_total}, ${backup.count}, ${backup.count_mean}, ${backup.error}, '${backup.date}')`;
 				} else {
 					console.log( `Row ${accounts[id].id} is empty, init a new row` );
-					query = `INSERT INTO ${table} VALUES ('${account.id}', 0, 0, 0, 0, 0, 0, 0, 0, '${getDate()}')`;
+					query = `INSERT INTO ${table} VALUES ('${account.id}', 0, 0, 0, 0, 0, 0, 0, 0, 0)`;
 				}
 				await database.query( query );
 				query = `SELECT * FROM ${table} WHERE  id='${account.id}'`;
