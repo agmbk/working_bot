@@ -13,6 +13,11 @@ new Logger( {
 	displayFunctionName: false,
 } );
 
+const RESET = '\u001b[0m';
+const BRIGHT_RED_FG = '\u001b[31;1m';
+console.log(BRIGHT_RED_FG + 'Bright red text' + RESET + ' Back to black');
+
+
 const csv_file = 'ouranos_working_bot.csv';
 
 function getDate() {
