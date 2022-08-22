@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import { accounts, database } from './data.js';
 import fs from 'fs';
+import 'colors';
 
 const csv_file = 'ouranos_working_bot.csv';
 
@@ -52,7 +53,7 @@ function getDate() {
 		} );
 		
 		/* For each account, set up a DB row, and add it to the data array */
-		console.log( '*** Database setup ***' );
+		console.log( '*** Database setup ***'.blue );
 		const data = await Promise.all( accounts.map( async (account, id) => {
 			
 			query = `SELECT * FROM ${table} WHERE  id='${account.id}'`;
@@ -118,7 +119,7 @@ function getDate() {
 		
 		let main_account;
 		accounts.forEach( account => {if (account.pay === false) {return main_account = account;}} );
-		console.log( '*** Workers start-up ***' );
+		console.log( '*** Workers start-up ***'.blue );
 		accounts.map( (account, id) => {
 			
 			/* Pay */
@@ -139,7 +140,7 @@ function getDate() {
 			}
 		} );
 		
-		console.log( '*** Work result ***' );
+		console.log( '*** Work result ***'.green.bold );
 		
 		async function work(account, id) {
 			/**
@@ -219,12 +220,12 @@ function getDate() {
 					if (money && res.ok) {
 						data[id].money_total += money;
 						data[id].money += money;
-						console.log( `Id: ${account.id} | Money: ${data[id].money} | Mean: ${data[id].money_mean} | Gain: ${money} | Count: ${data[id].count} | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
+						console.log( `Id: ${account.id.bold.green} | Money: ${data[id].money} | Mean: ${data[id].money_mean} | Gain: ${money} | Count: ${data[id].count} | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
 						
 						setTimeout( () => work( account, id ), work_interval + cooldown * Math.random() );
 						
 					} else {
-						console.log( `${account.id} failed, cooldown : ${retry / 6e4} mins ( OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Gain: ${money} | Error: ${data[id].error} | Date: ${getDate()} )` );
+						console.log( `${account.id.bold.red} failed, cooldown : ${retry / 6e4} mins ( OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Gain: ${money} | Error: ${data[id].error} | Date: ${getDate()} )` );
 						data[id].error += 1;
 						
 						setTimeout( () => work( account, id ), retry + cooldown * Math.random() );
@@ -232,7 +233,7 @@ function getDate() {
 					await save_data( data[id], account.id );
 				} );
 			} catch (e) {
-				console.log( 'Work crash', e );
+				console.log( 'Work has crashed'.red, e );
 				data[id].error += 1;
 				setTimeout( () => work( account, id ), retry + cooldown * Math.random() );
 			}
@@ -293,7 +294,7 @@ function getDate() {
 						} ) ).then( async money => {
 							
 							if (!money) {
-								console.log( `Id: ${payer.id} | Money laundering cancelled : You got no money !` );
+								console.log( `Id: ${payer.id.bold.red} | Money laundering cancelled : You got no money !` );
 								setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
 								return;
 							}
@@ -318,11 +319,11 @@ function getDate() {
 							} ).then( res => {
 								
 								if (res.ok) {
-									console.log( `Id: ${payer.id} | Money successfully laundered (${money})` );
+									console.log( `Id: ${payer.id.bold.green} | Money successfully laundered (${money.bold})` );
 									setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
 									
 								} else {
-									console.log( `Id: ${payer.id} | Money laundering failed, retry in ${retry / 6e4} mins` );
+									console.log( `Id: ${payer.id.bold.red} | Money laundering failed, retry in ${retry / 6e4} mins` );
 									setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
 								}
 								
@@ -335,7 +336,7 @@ function getDate() {
 					}
 				} );
 			} catch (e) {
-				console.log( 'Pay crash', e );
+				console.log( 'Pay has crashed'.red, e );
 				setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
 			}
 		} /* eof pay */
