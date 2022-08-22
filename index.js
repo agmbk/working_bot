@@ -2,6 +2,9 @@ import fetch from 'node-fetch';
 import { accounts, database } from './data.js';
 import fs from 'fs';
 
+String.prototype.red = function () {
+	return '\u001b[31;1m' + this + '\u001b[0m';
+};
 String.prototype.green = function () {
 	return '\u001b[32;1m' + this + '\u001b[0m';
 };
@@ -137,13 +140,14 @@ function getDate() {
 		
 		let main_account;
 		accounts.forEach( account => {if (account.pay === false) {return main_account = account;}} );
-		// console.log( '*** Workers start-up ***'.blue() );
-		console.log( '*** Work result ***'.blue() );
+		
+		console.log( '*** Workers start-up ***'.blue() );
+		
 		accounts.map( (account, id) => {
 			
 			/* Pay */
 			if (account.pay) {
-				console.log( `Account ${account.id} is paying ${main_account.id}` );
+				console.log( `${account.id} is paying ${main_account.id}` );
 				pay( account, main_account );
 			}
 			
@@ -157,6 +161,8 @@ function getDate() {
 				work( account, id, 0 );
 			}
 		} );
+		
+		console.log( '*** Work result ***'.blue() );
 		
 		async function work(account, id, timeout) {
 			/**
@@ -246,18 +252,17 @@ function getDate() {
 							data[id].money_total += money;
 							data[id].money += money;
 							
-							console.log( `Id: ${account.id.green()} | Money: ${data[id].money} | Mean: ${data[id].money_mean} | Gain: ${money} | Count: ${data[id].count} | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
+							console.log( `Id: ${account.id.green()} | Money: ${data[id].money.toString().blue()} | Mean: ${data[id].money_mean} | Gain: ${money.toString().green()} | Count: ${data[id].count} | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
 							
 							const timeout = work_interval + cooldown * Math.random();
 							await save_data( data[id], account.id );
 							await work( account, id, timeout );
 							
 						} else {
-							console.warn( `${account.id.red()} failed, cooldown : ${retry / 6e4} mins ( OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Gain: ${money} | Error: ${data[id].error} | Date: ${getDate()} )` );
+							console.warn( `${account.id.red()} failed ( OK: ${res.ok} | Status: ${res.status === 204 ? res.status.toString().green() : res.status.toString().red()} ${res.status === 204 ? res.statusText.toString().green() : res.statusText.toString().red()} | Gain: ${money === '0' ? money.toString().red() : money.toString().green()} | Error: ${data[id].error} | Date: ${getDate()} )` );
 							data[id].error += 1;
 							
 							const timeout = retry + cooldown * Math.random();
-							await save_data( data[id], account.id );
 							await work( account, id, timeout );
 						}
 					} );
@@ -298,7 +303,7 @@ function getDate() {
 					if (res.ok) {
 						
 						await new Promise( resolve => setTimeout( resolve, cooldown / 2 ) );
-						await fetch( 'https://discord.com/api/v9/channels/905426507021811772/messages?limit=10', {
+						const messages = await fetch( 'https://discord.com/api/v9/channels/905426507021811772/messages?limit=10', {
 							'headers': {
 								'accept': '*/*',
 								'accept-language': 'fr,fr-FR;q=0.9',
@@ -314,23 +319,36 @@ function getDate() {
 							'body': null,
 							'method': 'GET',
 							'mode': 'cors',
-						} ).then( res => res.json().then( json => {
-							
-							for (const message of json) {
-								if (message.author.id === '952125649345196044' && message.interaction.user.id === payer.id && message.interaction.name === 'money') {
-									return parseInt( message.content.split( '**' )[1] );
+						} ).then( res => res.json() );
+						
+						/* Try to get the last payement */
+						for (const message of messages) {
+							if (message.author.id === '952125649345196044' && message.interaction.user.id === payer.id && message.interaction.name === 'pay') {
+								const minutes = ((Date.parse( getDate() ) - Date.parse( message.timestamp )) / 6e4).toFixed( 0 );
+								const money = parseInt( message.content.split( '**' )[1] );
+								if (minutes < pay_interval / 6e4) {
+									console.warn( `${payer.id.green()} | Money already laundered ${minutes} mins ago (${money.toString().green()})` );
 								}
-							}
-							return 0;
-							
-						} ) ).then( async money => {
-							
-							if (!money) {
-								console.warn( `Id: ${payer.id.red()} | Money laundering cancelled : You got no money !` );
 								setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
 								return;
 							}
-							
+						}
+						
+						/* Get money amount from messages */
+						let money;
+						for (const message of json) {
+							if (message.author.id === '952125649345196044' && message.interaction.user.id === payer.id && message.interaction.name === 'money') {
+								money = parseInt( message.content.split( '**' )[1] );
+							}
+						}
+						
+						if (money === 0) {
+							console.warn( `${payer.id} | Money laundering cancelled : ${'You got no money'.red()} !` );
+							setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
+							return;
+						}
+						
+						if (money) {
 							await fetch( 'https://discord.com/api/v9/interactions', {
 								'headers': {
 									'accept': '*/*',
@@ -351,21 +369,18 @@ function getDate() {
 							} ).then( res => {
 								
 								if (res.ok) {
-									console.log( `Id: ${payer.id.green()} | Money successfully laundered (${money})` );
+									console.log( `${payer.id.green()} | Money successfully laundered (${money.toString().green()})` );
 									setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
 									
 								} else {
-									console.warn( `Id: ${payer.id.red()} | Money laundering failed, retry in ${retry / 6e4} mins` );
+									console.warn( `${payer.id.red()} | Money laundering failed, retry in ${retry / 6e4} mins` );
 									setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
 								}
-								
 							} );
-						} );
-						
-					} else {
-						console.error( `Fetching money failed | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}`.red() );
-						setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
+						}
 					}
+					console.error( `Fetching money failed | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}`.red() );
+					setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
 				} );
 			} catch (e) {
 				console.error( 'Pay has crashed'.red(), e );
