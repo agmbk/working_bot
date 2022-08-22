@@ -148,10 +148,10 @@ function getDate() {
 		
 		/* Work */
 		accounts.map( (account, id) => {
-			const wait_time = 60 - (Date.parse( getDate() ) - data[id].date.getTime()) / 6e4;
+			const wait_time = 60 - (Date.parse( getDate() ) - data[id].date.getTime()) / one_minute;
 			
 			if (wait_time > 0) {
-				const timeout = wait_time * 6e4 + cooldown * Math.random();
+				const timeout = wait_time * one_minute + cooldown * Math.random();
 				console.log( `${account.id} will works in ${wait_time.toFixed( 0 )} mins | Date: ${getDate()}` );
 				
 				work( account, id, timeout );
@@ -178,9 +178,8 @@ function getDate() {
 			/**
 			 * Work for each account, every hour
 			 */
-			const ninja = cant_c_me * Math.random();
-			timeout += ninja;
-			console.log( timeout / one_hour );
+			timeout += cant_c_me * Math.random();
+			console.log( 'Waiting ', (timeout / one_minute).toFixed( 0 ), 'mins' );
 			await new Promise( resolve => setTimeout( resolve, timeout ) );
 			
 			const hour = new Date( Date.parse( getDate() ) ).getHours();
@@ -340,9 +339,9 @@ function getDate() {
 						/* Try to get the last payement */
 						for (const message of messages) {
 							if (message.author.id === '952125649345196044' && message.interaction.user.id === payer.id && message.interaction.name === 'pay') {
-								const minutes = ((Date.parse( getDate() ) - Date.parse( message.timestamp )) / 6e4).toFixed( 0 );
+								const minutes = ((Date.parse( getDate() ) - Date.parse( message.timestamp )) / one_minute).toFixed( 0 );
 								const money = parseInt( message.content.split( '**' )[1] );
-								if (minutes < pay_interval / 6e4) {
+								if (minutes < pay_interval / one_minute) {
 									console.warn( `${payer.id.green()} | Money laundered ${minutes} mins ago (${money.toString().green()})` );
 								}
 								setTimeout( () => pay( payer, receiver ), pay_interval + cant_c_me * Math.random() );
@@ -388,7 +387,7 @@ function getDate() {
 									console.log( `${payer.id.green()} | Money successfully laundered (${money.toString().green()})` );
 									
 								} else {
-									console.warn( `${payer.id.red()} | Money laundering failed, retry in ${retry / 6e4} mins` );
+									console.warn( `${payer.id.red()} | Money laundering failed, retry in ${retry / one_minute} mins` );
 								}
 								setTimeout( () => pay( payer, receiver ), pay_interval + cant_c_me * Math.random() );
 							} );
