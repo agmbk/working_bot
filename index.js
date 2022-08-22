@@ -37,8 +37,10 @@ function getDate() {
 		
 		/* Read the backup */
 		
-		let csv_data = fs.readFileSync( './csv/' + csv_file, 'utf8' ).split( '\r\n' );
+		let csv_data = fs.readFileSync( './csv/' + csv_file, 'utf8' )
 		console.log('csv_data', csv_data);
+		csv_data = csv_data.split( '\r\n' );
+		console.log('csv_data split', csv_data);
 		const keys = csv_data[0].replace( /"/g, '' ).split( ',' );
 		console.log('keys', keys);
 		const database_bak = [];
