@@ -206,6 +206,8 @@ function getDate() {
 				informations: `${0}/${60} secs | Remains: ${minutes} mins`,
 			} );
 			
+			console.log(work_bar, work_bar.options, 'working');
+			
 			let count = 0;
 			const bar_interval = setInterval( () => {
 				if (work_bar.value === 60) {
@@ -329,6 +331,12 @@ function getDate() {
 					console.error( 'Work has crashed'.red(), e );
 					data[id].error += 1;
 					const timeout = retry + cooldown * Math.random();
+					
+					work_bar.options.format = `{id} - {task} | ${'{bar}'.red()} {percentage}% | {informations}`;
+					work_bar.update( work_bar.total, {
+						informations: `Fail | Retry in ${(timeout / 6e4).toFixed( 0 ).bold()} mins`,
+					} );
+					
 					work( account, id, timeout );
 				}
 			}
