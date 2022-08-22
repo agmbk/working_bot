@@ -139,7 +139,7 @@ function getDate() {
 			one_minute = 6e4,
 			pay_interval = one_hour * 48,
 			work_interval = one_hour,
-			cant_c_me = one_hour / 2,
+			cant_c_me = one_hour / 1,
 			retry = one_minute * 5;
 		
 		/** Workers */
