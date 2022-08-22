@@ -1,5 +1,8 @@
 import fetch from 'node-fetch';
 import { accounts, database } from './data.js';
+import fs from 'fs';
+
+const csv_file = 'ouranos_working_bot.csv';
 
 function getDate() {
 	return new Date().toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} );
@@ -17,39 +20,63 @@ function getDate() {
 		query = `
 		CREATE TABLE IF NOT EXISTS ${table}
 		(
-		    id VARCHAR(18) NOT NULL,
+		    id VARCHAR(20) NOT NULL,
+		    money_total integer NOT NULL,
 		    money integer NOT NULL,
 		    money_mean integer NOT NULL,
 		    total_days_count integer NOT NULL,
-		    total_count integer NOT NULL,
+		    count_total integer NOT NULL,
 		    count integer NOT NULL,
 		    count_mean integer NOT NULL,
 		    error integer NOT NULL,
 		    date timestamp without time zone NOT NULL,
 		    CONSTRAINT ouranos_working_bot_pkey PRIMARY KEY (id)
 		)`;
+		/* ! Add new column to insert into ! */
 		await database.query( query );
 		
-		/* For each account, set up a DB row */
+		/* Read the backup */
+		
+		let csv_data = fs.readFileSync( './csv/' + csv_file, 'utf8' ).replace( /"/g, '' ).split( '\r\n' );
+		const keys = csv_data[0].split( ',' );
+		const database_bak = [];
+		csv_data = csv_data.slice( 1 );
+		
+		csv_data.forEach( (line, line_i) => {
+			database_bak.push( {} );
+			line.split( ',' ).forEach( (item, i) => {
+				database_bak[line_i][keys[i]] = item;
+			} );
+		} );
+		
+		
+		/* For each account, set up a DB row, and add it to the data array */
 		const data = await Promise.all( accounts.map( async (account, id) => {
+			
 			query = `SELECT * FROM ${table} WHERE  id='${account.id}'`;
 			res = await database.query( query );
 			
-			/* Fill row with 0 if row is empty */
+			/* Initiate the row if row doesn't exist */
 			if (!res.rows.length) {
-				console.log( `Row ${accounts[id].id} is empty` );
-				query = `INSERT INTO ${table} (id, money, money_mean, total_days_count, total_count, count, count_mean, error, date) VALUES ('${account.id}', 0, 0, 0, 0, 0, 0, 0, '${getDate()}')`;
+				const backup = database_bak.find( obj => obj.id === account.id );
+				if (backup) {
+					console.log( `Row ${accounts[id].id} is empty, backup recovery` );
+					query = `INSERT INTO ${table} VALUES ('${account.id}', ${backup.money_total}, ${backup.money}, ${backup.money_mean}, ${backup.total_days_count}, ${backup.count_total}, ${backup.count}, ${backup.count_mean}, ${backup.error}, '${backup.date}')`;
+				} else {
+					console.log( `Row ${accounts[id].id} is empty, init a new row` );
+					query = `INSERT INTO ${table} VALUES ('${account.id}', 0, 0, 0, 0, 0, 0, 0, 0, '${getDate()}')`;
+				}
 				await database.query( query );
 				query = `SELECT * FROM ${table} WHERE  id='${account.id}'`;
 				res = await database.query( query );
 			}
-			/* Fill data with accounts data */
+			
 			return res.rows[0];
 		} ) );
 		
 		console.log( data );
 		
-		async function save_data(id) {
+		async function save_data(data, id) {
 			/**
 			 * Save data in the corresponding DB row
 			 * id: The DB row id
@@ -59,15 +86,16 @@ function getDate() {
 				query = `
 				UPDATE ${table}
 				SET
-				money = ${data[id].money},
-				money_mean = ${data[id].money_mean},
-				total_days_count = ${data[id].total_days_count},
-				total_count = ${data[id].total_count},
-				count = ${data[id].count},
-				count_mean = ${data[id].count_mean},
-				error = ${data[id].error},
+				total_days_count = ${data.total_days_count},
+				money_total = ${data.money_total},
+				money = ${data.money},
+				money_mean = ${data.money_mean},
+				count_total = ${data.count_total},
+				count = ${data.count},
+				count_mean = ${data.count_mean},
+				error = ${data.error},
 				date = '${getDate()}'
-				WHERE id='${accounts[id].id}'
+				WHERE id='${id}'
 				`;
 				await database.query( query );
 			} catch (e) {
@@ -94,7 +122,7 @@ function getDate() {
 			/* Pay */
 			if (account.pay) {
 				console.log( `Account ${account.id} is paying ${main_account.id}` );
-				//pay( account, main_account );
+				pay( account, main_account );
 			}
 			
 			/* Work */
@@ -145,12 +173,13 @@ function getDate() {
 						data[id].total_days_count += 1;
 						data[id].count_mean += ((data[id].count - data[id].count_mean) / data[id].total_days_count);
 						data[id].money_mean += ((data[id].money - data[id].money_mean) / data[id].total_days_count);
+						data[id].money = 0;
 						data[id].count = 0;
 					}
 					let money = 0;
 					if (res.ok) {
 						data[id].count += 1;
-						data[id].total_count += 1;
+						data[id].count_total += 1;
 						
 						/**
 						 * Fetch money gain
@@ -185,6 +214,7 @@ function getDate() {
 						} ) );
 					}
 					if (money && res.ok) {
+						data[id].money_total += money;
 						data[id].money += money;
 						console.log( `Id: ${account.id} | Money: ${data[id].money} | Mean: ${data[id].money_mean} | Gain: ${money} | Count: ${data[id].count} | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
 						
@@ -196,7 +226,7 @@ function getDate() {
 						
 						setTimeout( () => work( account, id ), retry + cooldown * Math.random() );
 					}
-					await save_data( id );
+					await save_data( data[id], account.id );
 				} );
 			} catch (e) {
 				console.log( 'Work crash', e );
