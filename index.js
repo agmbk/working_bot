@@ -38,7 +38,6 @@ function getDate() {
 		/* Read the backup */
 		
 		let csv_data = fs.readFileSync( './csv/' + csv_file, 'utf8' ).replace( /"/g, '' ).split( '\r\n' );
-		console.log(csv_data);
 		const keys = csv_data[0].split( ',' );
 		const database_bak = [];
 		csv_data = csv_data.slice( 1 );
@@ -46,10 +45,11 @@ function getDate() {
 		csv_data.forEach( (line, line_i) => {
 			database_bak.push( {} );
 			line.split( ',' ).forEach( (item, i) => {
-				database_bak[line_i][keys[i]] = item;
+				database_bak[line_i][keys[i]] = item.replace('\n', '').replace('\r', '');
 			} );
 		} );
 		
+		console.log(database_bak);
 		
 		/* For each account, set up a DB row, and add it to the data array */
 		const data = await Promise.all( accounts.map( async (account, id) => {
