@@ -154,7 +154,6 @@ function getDate() {
 				const timeout = wait_time * 6e4 + cooldown * Math.random();
 				work( account, id, timeout );
 			} else {
-				console.log( `${account.id} will works now` );
 				work( account, id, 0 );
 			}
 		} );
@@ -165,7 +164,7 @@ function getDate() {
 			 */
 			const minutes = (timeout / 6e4).toFixed( 0 );
 			
-			console.log( '', `${account.id} will works in ${minutes} mins | Date: ${getDate()}` );
+			console.log( `${account.id} will works ${minutes === '0' ? 'now' : `in ${minutes} mins`} | Date: ${getDate()}` );
 			
 			setTimeout( () => {
 				worker();
@@ -250,6 +249,7 @@ function getDate() {
 							console.log( `Id: ${account.id.green()} | Money: ${data[id].money} | Mean: ${data[id].money_mean} | Gain: ${money} | Count: ${data[id].count} | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
 							
 							const timeout = work_interval + cooldown * Math.random();
+							await save_data( data[id], account.id );
 							await work( account, id, timeout );
 							
 						} else {
@@ -257,9 +257,9 @@ function getDate() {
 							data[id].error += 1;
 							
 							const timeout = retry + cooldown * Math.random();
+							await save_data( data[id], account.id );
 							await work( account, id, timeout );
 						}
-						await save_data( data[id], account.id );
 					} );
 				} catch (e) {
 					console.error( 'Work has crashed'.red(), e );
@@ -364,6 +364,7 @@ function getDate() {
 						
 					} else {
 						console.error( `Fetching money failed | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}`.red() );
+						setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
 					}
 				} );
 			} catch (e) {
