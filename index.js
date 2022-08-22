@@ -1,22 +1,36 @@
 import fetch from 'node-fetch';
 import { accounts, database } from './data.js';
 import fs from 'fs';
-import { Logger } from 'tslog';
+import chalk from 'chalk';
+import cliProgress from 'cli-progress';
 
-new Logger( {
-	name: 'console',
-	overwriteConsole: true,
-	type: 'pretty',
-	displayDateTime: false,
-	displayLoggerName: false,
-	displayFilePath: 'hidden',
-	displayFunctionName: false,
-} );
-
-const RESET = '\u001b[0m';
-const BRIGHT_RED_FG = '\u001b[31;1m';
-console.log(BRIGHT_RED_FG + 'Bright red text' + RESET + ' Back to black');
-
+String.prototype.red = function () {
+	return chalk.red( this );
+};
+String.prototype.green = function () {
+	return chalk.green( this );
+};
+String.prototype.yellow = function () {
+	return chalk.yellow( this );
+};
+String.prototype.blue = function () {
+	return chalk.blue( this );
+};
+String.prototype.magenta = function () {
+	return chalk.magenta( this );
+};
+String.prototype.cyan = function () {
+	return chalk.cyan( this );
+};
+String.prototype.grey = function () {
+	return chalk.grey( this );
+};
+String.prototype.bold = function () {
+	return chalk.bold( this );
+};
+String.prototype.italic = function () {
+	return chalk.italic( this );
+};
 
 const csv_file = 'ouranos_working_bot.csv';
 
@@ -26,6 +40,19 @@ function getDate() {
 
 (async function () {
 	try {
+		/** Progress bars */
+		
+		const bars = new cliProgress.MultiBar( {
+			// {percentage}%
+			format: `{id} - {task} | ${'{bar}'.blue()} {informations}`,
+			barCompleteChar: '■',
+			barIncompleteChar: '=',
+			hideCursor: true,
+			clearOnComplete: true,
+			stopOnComplete: false,
+			fps: 1,
+		}, cliProgress.Presets.rect );
+		
 		/** DB setup */
 		
 		await database.connect();
@@ -68,7 +95,7 @@ function getDate() {
 		} );
 		
 		/* For each account, set up a DB row, and add it to the data array */
-		console.info( '*** Database setup ***' );
+		console.log( '*** Database setup ***'.blue().bold() );
 		const data = await Promise.all( accounts.map( async (account, id) => {
 			
 			query = `SELECT * FROM ${table} WHERE  id='${account.id}'`;
@@ -92,7 +119,7 @@ function getDate() {
 			return res.rows[0];
 		} ) );
 		
-		console.debug( data );
+		console.log( data );
 		
 		async function save_data(data, id) {
 			/**
@@ -134,7 +161,8 @@ function getDate() {
 		
 		let main_account;
 		accounts.forEach( account => {if (account.pay === false) {return main_account = account;}} );
-		console.info( '*** Workers start-up ***' );
+		// console.log( '*** Workers start-up ***'.blue().bold() );
+		console.log( '*** Work result ***'.blue().bold() );
 		accounts.map( (account, id) => {
 			
 			/* Pay */
@@ -147,110 +175,162 @@ function getDate() {
 			const wait_time = 60 - (Date.parse( getDate() ) - data[id].date.getTime()) / 6e4;
 			
 			if (wait_time > 0) {
-				console.log( `${account.id} will works in ${wait_time.toFixed( 0 )} mins | Date: ${getDate()}` );
-				setTimeout( () => work( account, id ), wait_time * 6e4 + cooldown * Math.random() );
+				const timeout = wait_time * 6e4 + cooldown * Math.random();
+				work( account, id, timeout );
 			} else {
 				console.log( `${account.id} will works now` );
-				work( account, id );
+				work( account, id, 0 );
 			}
 		} );
 		
-		console.info( '*** Work result ***' );
-		
-		async function work(account, id) {
+		async function work(account, id, timeout) {
 			/**
 			 * Work for each account, every hour
 			 */
-			try {
-				await fetch( 'https://discord.com/api/v9/interactions', {
-					'headers': {
-						'accept': '*/*',
-						'accept-language': 'fr,fr-FR;q=0.9',
-						'authorization': account.authorization,
-						'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryMcqN0DmNbQHonseA',
-						'sec-fetch-dest': 'empty',
-						'sec-fetch-mode': 'cors',
-						'sec-fetch-site': 'same-origin',
-						'x-debug-options': 'bugReporterEnabled',
-						'x-discord-locale': 'en-GB',
-						'x-fingerprint': '1010702419111460874.LzvOdL3jTREmOoBLHZQudC-bGV4',
-						'x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiRGlzY29yZCBDbGllbnQiLCJyZWxlYXNlX2NoYW5uZWwiOiJzdGFibGUiLCJjbGllbnRfdmVyc2lvbiI6IjEuMC45MDA2Iiwib3NfdmVyc2lvbiI6IjEwLjAuMjIwMDAiLCJvc19hcmNoIjoieDY0Iiwic3lzdGVtX2xvY2FsZSI6ImZyIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTQyODY4LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==',
-						'cookie': '__dcfduid=0c095750eae211ec9277b769df24b26a; __sdcfduid=0c095751eae211ec9277b769df24b26a78e0361b8f672f8cf7c211b13c347439284eab11bde79ecf445cdd901eadf5ec; __stripe_mid=55cdba8e-92b0-496c-8851-3025451e30e60d8f68; locale=en-GB',
-					},
-					'referrer': 'https://discord.com/channels/902947280162811975/905426507021811772',
-					'referrerPolicy': 'strict-origin-when-cross-origin',
-					'body': `------WebKitFormBoundaryMcqN0DmNbQHonseA\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n\r\n{\"type\":2,\"application_id\":\"952125649345196044\",\"guild_id\":\"902947280162811975\",\"channel_id\":\"905426507021811772\",\"session_id\":\"${account.session_id}\",\"data\":{\"version\":\"1001148798988472382\",\"id\":\"1001148798988472381\",\"guild_id\":\"902947280162811975\",\"name\":\"work\",\"type\":1,\"options\":[],\"attachments\":[]},\"nonce\":\"1010702591710986240\"}\r\n------WebKitFormBoundaryMcqN0DmNbQHonseA--\r\n`,
-					'method': 'POST',
-					'mode': 'cors',
-				} ).then( async res => {
-					/* To compare with the bot message timestamp */
-					const timestamp = new Date().setMilliseconds( -cooldown );
-					
-					/* Calculate mean of the day */
-					if (new Date( Date.parse( getDate() ) ).getDate() !== data[id].date.getDate()) {
-						data[id].date = new Date().getDay();
-						data[id].total_days_count += 1;
-						data[id].count_mean += ((data[id].count - data[id].count_mean) / data[id].total_days_count);
-						data[id].money_mean += ((data[id].money - data[id].money_mean) / data[id].total_days_count);
-						data[id].money = 0;
-						data[id].count = 0;
-					}
-					let money = 0;
-					if (res.ok) {
-						data[id].count += 1;
-						data[id].count_total += 1;
-						
-						/**
-						 * Fetch money gain
-						 */
-						await new Promise( resolve => setTimeout( resolve, cooldown / 2 ) );
-						money = await fetch( 'https://discord.com/api/v9/channels/905426507021811772/messages?limit=10', {
-							'headers': {
-								'accept': '*/*',
-								'accept-language': 'fr,fr-FR;q=0.9',
-								'authorization': account.authorization,
-								'sec-fetch-dest': 'empty',
-								'sec-fetch-mode': 'cors',
-								'sec-fetch-site': 'same-origin',
-								'x-debug-options': 'bugReporterEnabled',
-								'x-discord-locale': 'en-GB',
-							},
-							'referrer': 'https://discord.com/channels/902947280162811975/952558030556389466',
-							'referrerPolicy': 'strict-origin-when-cross-origin',
-							'body': null,
-							'method': 'GET',
-							'mode': 'cors',
-						} ).then( res => res.json().then( json => {
-							
-							/* Get the last message > timestamp - cooldown */
-							for (const message of json) {
-								if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
-									if (new Date( message.timestamp ).getTime() > timestamp) return parseInt( message.content.split( '**' )[1] );
-								}
-							}
-							return 0;
-							
-						} ) );
-					}
-					if (money && res.ok) {
-						data[id].money_total += money;
-						data[id].money += money;
-						console.log( `Id: ${account.id} | Money: ${data[id].money} | Mean: ${data[id].money_mean} | Gain: ${money} | Count: ${data[id].count} | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
-						
-						setTimeout( () => work( account, id ), work_interval + cooldown * Math.random() );
-						
-					} else {
-						console.warn( `${account.id} failed, cooldown : ${retry / 6e4} mins ( OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Gain: ${money} | Error: ${data[id].error} | Date: ${getDate()} )` );
-						data[id].error += 1;
-						
-						setTimeout( () => work( account, id ), retry + cooldown * Math.random() );
-					}
-					await save_data( data[id], account.id );
+			
+			setTimeout( () => {
+				clearInterval( bar_interval );
+				work_bar.update( work_bar.total, {
+					informations: `Processing ...`,
 				} );
-			} catch (e) {
-				console.error( 'Work has crashed', e );
-				data[id].error += 1;
-				setTimeout( () => work( account, id ), retry + cooldown * Math.random() );
+				worker();
+			}, timeout );
+			
+			const minutes = (timeout / 6e4).toFixed( 0 );
+			
+			// console.log( '', `${account.id} will works in ${minutes} mins | Date: ${getDate()}` );
+			
+			const work_bar = bars.create( 60, 0, {
+				id: account.id,
+				task: 'work',
+				informations: `${0}/${60} secs | Remains: ${minutes} mins`,
+			} );
+			
+			let count = 0;
+			const bar_interval = setInterval( () => {
+				if (work_bar.value === 60) {
+					work_bar.increment();
+					work_bar.value = 0;
+					count++;
+				}
+				work_bar.increment();
+				work_bar.update( work_bar.value, {
+					informations: `${work_bar.value}/${60} secs | Remains: ${minutes - count} mins`,
+				} );
+			}, 1000 );
+			
+			
+			async function worker() {
+				work_bar.update( work_bar.total, {
+					informations: `Processing ...`,
+				} );
+				try {
+					await fetch( 'https://discord.com/api/v9/interactions', {
+						'headers': {
+							'accept': '*/*',
+							'accept-language': 'fr,fr-FR;q=0.9',
+							'authorization': account.authorization,
+							'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryMcqN0DmNbQHonseA',
+							'sec-fetch-dest': 'empty',
+							'sec-fetch-mode': 'cors',
+							'sec-fetch-site': 'same-origin',
+							'x-debug-options': 'bugReporterEnabled',
+							'x-discord-locale': 'en-GB',
+							'x-fingerprint': '1010702419111460874.LzvOdL3jTREmOoBLHZQudC-bGV4',
+							'x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiRGlzY29yZCBDbGllbnQiLCJyZWxlYXNlX2NoYW5uZWwiOiJzdGFibGUiLCJjbGllbnRfdmVyc2lvbiI6IjEuMC45MDA2Iiwib3NfdmVyc2lvbiI6IjEwLjAuMjIwMDAiLCJvc19hcmNoIjoieDY0Iiwic3lzdGVtX2xvY2FsZSI6ImZyIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTQyODY4LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==',
+							'cookie': '__dcfduid=0c095750eae211ec9277b769df24b26a; __sdcfduid=0c095751eae211ec9277b769df24b26a78e0361b8f672f8cf7c211b13c347439284eab11bde79ecf445cdd901eadf5ec; __stripe_mid=55cdba8e-92b0-496c-8851-3025451e30e60d8f68; locale=en-GB',
+						},
+						'referrer': 'https://discord.com/channels/902947280162811975/905426507021811772',
+						'referrerPolicy': 'strict-origin-when-cross-origin',
+						'body': `------WebKitFormBoundaryMcqN0DmNbQHonseA\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n\r\n{\"type\":2,\"application_id\":\"952125649345196044\",\"guild_id\":\"902947280162811975\",\"channel_id\":\"905426507021811772\",\"session_id\":\"${account.session_id}\",\"data\":{\"version\":\"1001148798988472382\",\"id\":\"1001148798988472381\",\"guild_id\":\"902947280162811975\",\"name\":\"work\",\"type\":1,\"options\":[],\"attachments\":[]},\"nonce\":\"1010702591710986240\"}\r\n------WebKitFormBoundaryMcqN0DmNbQHonseA--\r\n`,
+						'method': 'POST',
+						'mode': 'cors',
+					} ).then( async res => {
+						/* To compare with the bot message timestamp */
+						const timestamp = new Date().setMilliseconds( -cooldown );
+						
+						/* Calculate mean of the day */
+						if (new Date( Date.parse( getDate() ) ).getDate() !== data[id].date.getDate()) {
+							data[id].date = new Date().getDay();
+							data[id].total_days_count += 1;
+							data[id].count_mean += ((data[id].count - data[id].count_mean) / data[id].total_days_count);
+							data[id].money_mean += ((data[id].money - data[id].money_mean) / data[id].total_days_count);
+							data[id].money = 0;
+							data[id].count = 0;
+						}
+						let money = 0;
+						if (res.ok) {
+							data[id].count += 1;
+							data[id].count_total += 1;
+							
+							/**
+							 * Fetch money gain
+							 */
+							await new Promise( resolve => setTimeout( resolve, cooldown / 2 ) );
+							money = await fetch( 'https://discord.com/api/v9/channels/905426507021811772/messages?limit=10', {
+								'headers': {
+									'accept': '*/*',
+									'accept-language': 'fr,fr-FR;q=0.9',
+									'authorization': account.authorization,
+									'sec-fetch-dest': 'empty',
+									'sec-fetch-mode': 'cors',
+									'sec-fetch-site': 'same-origin',
+									'x-debug-options': 'bugReporterEnabled',
+									'x-discord-locale': 'en-GB',
+								},
+								'referrer': 'https://discord.com/channels/902947280162811975/952558030556389466',
+								'referrerPolicy': 'strict-origin-when-cross-origin',
+								'body': null,
+								'method': 'GET',
+								'mode': 'cors',
+							} ).then( res => res.json().then( json => {
+								
+								/* Get the last message > timestamp - cooldown */
+								for (const message of json) {
+									if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
+										if (new Date( message.timestamp ).getTime() > timestamp) return parseInt( message.content.split( '**' )[1] );
+									}
+								}
+								return 0;
+								
+							} ) );
+						}
+						if (money && res.ok) {
+							data[id].money_total += money;
+							data[id].money += money;
+							// console.log( `Id: ${account.id} | Money: ${data[id].money} | Mean: ${data[id].money_mean} | Gain: ${money} | Count: ${data[id].count} | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
+							const timeout = work_interval + cooldown * Math.random();
+							
+							work_bar.options.format = `{id} - {task} | ${'{bar}'.green()} {percentage}% | {informations}`;
+							work_bar.update( work_bar.total, {
+								informations: `Success | Gain : ${money.bold()}`,
+							} );
+							
+							work( account, id, timeout );
+							
+						} else {
+							// console.warn( `${account.id} failed, cooldown : ${retry / 6e4} mins ( OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Gain: ${money} | Error: ${data[id].error} | Date: ${getDate()} )` );
+							
+							const timeout = retry + cooldown * Math.random();
+							
+							work_bar.options.format = `{id} - {task} | ${'{bar}'.red()} {percentage}% | {informations}`;
+							
+							work_bar.update( work_bar.total, {
+								informations: `Fail | Retry in ${(timeout / 6e4).toFixed( 0 ).bold()} mins`,
+							} );
+							
+							data[id].error += 1;
+							
+							work( account, id, timeout );
+						}
+						await save_data( data[id], account.id );
+					} );
+				} catch (e) {
+					console.error( 'Work has crashed'.red(), e );
+					data[id].error += 1;
+					const timeout = retry + cooldown * Math.random();
+					work( account, id, timeout );
+				}
 			}
 		} /* eof work */
 		
@@ -309,7 +389,7 @@ function getDate() {
 						} ) ).then( async money => {
 							
 							if (!money) {
-								console.warn( `Id: ${payer.id.red} | Money laundering cancelled : You got no money !` );
+								console.warn( `Id: ${payer.id.red()} | Money laundering cancelled : You got no money !` );
 								setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
 								return;
 							}
@@ -334,11 +414,11 @@ function getDate() {
 							} ).then( res => {
 								
 								if (res.ok) {
-									console.log( `Id: ${payer.id.green} | Money successfully laundered (${money})` );
+									console.log( `Id: ${payer.id.green()} | Money successfully laundered (${money})` );
 									setTimeout( () => pay( payer, receiver ), pay_interval + cooldown * Math.random() );
 									
 								} else {
-									console.warn( `Id: ${payer.id.red} | Money laundering failed, retry in ${retry / 6e4} mins` );
+									console.warn( `Id: ${payer.id.red()} | Money laundering failed, retry in ${retry / 6e4} mins` );
 									setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
 								}
 								
@@ -346,11 +426,11 @@ function getDate() {
 						} );
 						
 					} else {
-						console.error( `Fetching money failed | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
+						console.error( `Fetching money failed | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}`.red() );
 					}
 				} );
 			} catch (e) {
-				console.error( 'Pay has crashed', e );
+				console.error( 'Pay has crashed'.red(), e );
 				setTimeout( () => pay( payer, receiver ), retry + cooldown * Math.random() );
 			}
 		} /* eof pay */
@@ -359,3 +439,8 @@ function getDate() {
 		console.error( e );
 	}
 })();
+
+// light '\u001b[31;2m' + this + '\u001b[0m'
+// bright '\u001b[31;1m' + this + '\u001b[0m'
+// underline '\u001b[31;4m' + this + '\u001b[0m'
+// highlight '\u001b[31;7m' + this + '\u001b[0m'
