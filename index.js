@@ -206,7 +206,9 @@ function getDate() {
 				informations: `${0}/${60} secs | Remains: ${minutes} mins`,
 			} );
 			
-			console.log(work_bar, work_bar.options, 'working');
+			console.log(work_bar.isActive);
+			
+			work_bar.render(true)
 			
 			let count = 0;
 			const bar_interval = setInterval( () => {
