@@ -1,35 +1,24 @@
 import fetch from 'node-fetch';
 import { accounts, database } from './data.js';
 import fs from 'fs';
-import chalk from 'chalk';
-import cliProgress from 'cli-progress';
 
-String.prototype.red = function () {
-	return chalk.red( this );
-};
 String.prototype.green = function () {
-	return chalk.green( this );
+	return '\u001b[32;1m' + this + '\u001b[0m';
 };
 String.prototype.yellow = function () {
-	return chalk.yellow( this );
+	return '\u001b[33;1m' + this + '\u001b[0m';
 };
 String.prototype.blue = function () {
-	return chalk.blue( this );
+	return '\u001b[34;1m' + this + '\u001b[0m';
 };
-String.prototype.magenta = function () {
-	return chalk.magenta( this );
+String.prototype.purple = function () {
+	return '\u001b[35;1m' + this + '\u001b[0m';
 };
 String.prototype.cyan = function () {
-	return chalk.cyan( this );
+	return '\u001b[36;1m' + this + '\u001b[0m';
 };
 String.prototype.grey = function () {
-	return chalk.grey( this );
-};
-String.prototype.bold = function () {
-	return chalk.bold( this );
-};
-String.prototype.italic = function () {
-	return chalk.italic( this );
+	return '\u001b[37;1m' + this + '\u001b[0m';
 };
 
 const csv_file = 'ouranos_working_bot.csv';
@@ -40,19 +29,6 @@ function getDate() {
 
 (async function () {
 	try {
-		/** Progress bars */
-		
-		const bars = new cliProgress.MultiBar( {
-			// {percentage}%
-			format: `{id} - {task} | ${'{bar}'.blue()} {informations}`,
-			barCompleteChar: '■',
-			barIncompleteChar: '=',
-			hideCursor: true,
-			clearOnComplete: true,
-			stopOnComplete: false,
-			fps: 1,
-		}, cliProgress.Presets.rect );
-		
 		/** DB setup */
 		
 		await database.connect();
@@ -95,7 +71,7 @@ function getDate() {
 		} );
 		
 		/* For each account, set up a DB row, and add it to the data array */
-		console.log( '*** Database setup ***'.blue().bold() );
+		console.log( '*** Database setup ***'.blue() );
 		const data = await Promise.all( accounts.map( async (account, id) => {
 			
 			query = `SELECT * FROM ${table} WHERE  id='${account.id}'`;
@@ -161,8 +137,8 @@ function getDate() {
 		
 		let main_account;
 		accounts.forEach( account => {if (account.pay === false) {return main_account = account;}} );
-		// console.log( '*** Workers start-up ***'.blue().bold() );
-		console.log( '*** Work result ***'.blue().bold() );
+		// console.log( '*** Workers start-up ***'.blue() );
+		console.log( '*** Work result ***'.blue() );
 		accounts.map( (account, id) => {
 			
 			/* Pay */
@@ -187,47 +163,15 @@ function getDate() {
 			/**
 			 * Work for each account, every hour
 			 */
+			const minutes = (timeout / 6e4).toFixed( 0 );
+			
+			console.log( '', `${account.id} will works in ${minutes} mins | Date: ${getDate()}` );
 			
 			setTimeout( () => {
-				clearInterval( bar_interval );
-				work_bar.update( work_bar.total, {
-					informations: `Processing ...`,
-				} );
 				worker();
 			}, timeout );
 			
-			const minutes = (timeout / 6e4).toFixed( 0 );
-			
-			// console.log( '', `${account.id} will works in ${minutes} mins | Date: ${getDate()}` );
-			
-			const work_bar = bars.create( 60, 0, {
-				id: account.id,
-				task: 'work',
-				informations: `${0}/${60} secs | Remains: ${minutes} mins`,
-			} );
-			
-			console.log(work_bar.isActive);
-			
-			work_bar.render(true)
-			
-			let count = 0;
-			const bar_interval = setInterval( () => {
-				if (work_bar.value === 60) {
-					work_bar.increment();
-					work_bar.value = 0;
-					count++;
-				}
-				work_bar.increment();
-				work_bar.update( work_bar.value, {
-					informations: `${work_bar.value}/${60} secs | Remains: ${minutes - count} mins`,
-				} );
-			}, 1000 );
-			
-			
 			async function worker() {
-				work_bar.update( work_bar.total, {
-					informations: `Processing ...`,
-				} );
 				try {
 					await fetch( 'https://discord.com/api/v9/interactions', {
 						'headers': {
@@ -302,44 +246,27 @@ function getDate() {
 						if (money && res.ok) {
 							data[id].money_total += money;
 							data[id].money += money;
-							// console.log( `Id: ${account.id} | Money: ${data[id].money} | Mean: ${data[id].money_mean} | Gain: ${money} | Count: ${data[id].count} | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
+							
+							console.log( `Id: ${account.id.green()} | Money: ${data[id].money} | Mean: ${data[id].money_mean} | Gain: ${money} | Count: ${data[id].count} | OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Date: ${getDate()}` );
+							
 							const timeout = work_interval + cooldown * Math.random();
-							
-							work_bar.options.format = `{id} - {task} | ${'{bar}'.green()} {percentage}% | {informations}`;
-							work_bar.update( work_bar.total, {
-								informations: `Success | Gain : ${money.bold()}`,
-							} );
-							
-							work( account, id, timeout );
+							await work( account, id, timeout );
 							
 						} else {
-							// console.warn( `${account.id} failed, cooldown : ${retry / 6e4} mins ( OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Gain: ${money} | Error: ${data[id].error} | Date: ${getDate()} )` );
-							
-							const timeout = retry + cooldown * Math.random();
-							
-							work_bar.options.format = `{id} - {task} | ${'{bar}'.red()} {percentage}% | {informations}`;
-							
-							work_bar.update( work_bar.total, {
-								informations: `Fail | Retry in ${(timeout / 6e4).toFixed( 0 ).bold()} mins`,
-							} );
-							
+							console.warn( `${account.id.red()} failed, cooldown : ${retry / 6e4} mins ( OK: ${res.ok} | Status: ${res.status} ${res.statusText} | Gain: ${money} | Error: ${data[id].error} | Date: ${getDate()} )` );
 							data[id].error += 1;
 							
-							work( account, id, timeout );
+							const timeout = retry + cooldown * Math.random();
+							await work( account, id, timeout );
 						}
 						await save_data( data[id], account.id );
 					} );
 				} catch (e) {
 					console.error( 'Work has crashed'.red(), e );
 					data[id].error += 1;
+					
 					const timeout = retry + cooldown * Math.random();
-					
-					work_bar.options.format = `{id} - {task} | ${'{bar}'.red()} {percentage}% | {informations}`;
-					work_bar.update( work_bar.total, {
-						informations: `Fail | Retry in ${(timeout / 6e4).toFixed( 0 ).bold()} mins`,
-					} );
-					
-					work( account, id, timeout );
+					await work( account, id, timeout );
 				}
 			}
 		} /* eof work */
