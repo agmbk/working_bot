@@ -179,7 +179,7 @@ function getDate() {
 			 * Work for each account, every hour
 			 */
 			timeout += cant_c_me * Math.random();
-			console.log( 'Waiting ', (timeout / one_minute).toFixed( 0 ), 'mins' );
+			console.log( 'Waiting', (timeout / one_minute).toFixed( 0 ), 'mins' );
 			await new Promise( resolve => setTimeout( resolve, timeout ) );
 			
 			const hour = new Date( Date.parse( getDate() ) ).getHours();
