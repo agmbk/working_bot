@@ -5,7 +5,7 @@ import mainAccount from './data/mainAccount.js';
 import getDate from './functions/getDate.js';
 import work from './functions/work.js';
 // import pay from './functions/pay.js';
-import './data/Color.js';
+import './data/color.js';
 
 
 try {

@@ -8,32 +8,34 @@ function resFormat(res) {
 	return `OK: ${res.ok ? res.ok.toString().green() : res.ok.toString().red()} | Status: ${res.status === 204 ? `${res.status} ${res.statusText}`.green() : `${res.status} ${res.statusText}`.red()}`;
 }
 
+/**
+ * @name work
+ * @description Work, fetch gain and save it into the DB, every work_interval
+ * first fetch: works
+ * second fetch: fetch money gain amount
+ *
+ * @param {Object} account account
+ * @param {Object} data data corresponding to the account
+ * @param {int} timeout time in milliseconds to wait before working
+ * @returns {void}
+ */
 export default async function work(account, data, timeout) {
-	/**
-	 * Work for each account, every hour
-	 *
-	 * first fetch: works
-	 * second fetch: fetch money gain amount
-	 *
-	 * @param {Object} account The account
-	 * @param {Object} data Data corresponding to the account
-	 * @param {number} timeout Timeout before executing the function
-	 */
+	
 	timeout += config.cant_c_me * Math.random();
 	console.log( 'Waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins' );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
 	/* Work less at night */
 	if (config.night.includes( new Date( Date.parse( getDate() ) ).getHours() )) {
-		console.log( `It's the night : ${config.night}` );
+		console.log( `It's the night` );
 		const timeout = config.work_interval + config.cooldown * Math.random();
-		if (Math.random() > 0.5) return await work( account, data, timeout );
+		if (Math.random() > 0.5) return work( account, data, timeout );
 	}
 	
 	/* Secondary accounts work 2 time less */
 	if (account.id !== mainAccount.id) {
 		const timeout = config.work_interval + config.cooldown * Math.random();
-		if (Math.random() > 0.5) return await work( account, data, timeout );
+		if (Math.random() > 0.5) return work( account, data, timeout );
 	}
 	
 	try {
@@ -114,15 +116,15 @@ export default async function work(account, data, timeout) {
 				console.log( `${account.id.green()} | Money: ${data.money.toString().blue()} | Mean: ${data.money_mean} | Gain: ${money.toString().green()} | Count: ${data.count} | Date: ${getDate()}` );
 				
 				const timeout = config.work_interval + config.cooldown * Math.random();
-				await save_data( data, account.id );
-				await work( account, data, timeout );
+				await save_data( 'data', account.id );
+				return work( account, data, timeout );
 				
 			} else {
 				console.warn( `${account.id.red()} failed ( ${resFormat( res )} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data.error} | Date: ${getDate()} )` );
 				data.error += 1;
 				
 				const timeout = config.retry + config.cooldown * Math.random();
-				await work( account, data, timeout );
+				return work( account, data, timeout );
 			}
 		} );
 	} catch (e) {
@@ -130,7 +132,7 @@ export default async function work(account, data, timeout) {
 		data.error += 1;
 		
 		const timeout = config.retry + config.cooldown * Math.random();
-		await work( account, data, timeout );
+		return work( account, data, timeout );
 	}
 	
 } /* eof work */

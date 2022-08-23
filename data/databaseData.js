@@ -10,7 +10,7 @@ let query, res;
 /* Create the DB if not exist */
 query = `
 	CREATE TABLE IF NOT EXISTS ${config.table}
-	(
+	( /* ! Add new column to insert into ! */
 	    id VARCHAR(20) NOT NULL,
 	    money_total integer NOT NULL,
 	    money integer NOT NULL,
@@ -24,11 +24,10 @@ query = `
 	    CONSTRAINT ouranos_working_bot_pkey PRIMARY KEY (id)
 	)`;
 
-/* ! Add new column to insert into ! */
 await database.query( query );
 
 /* Read the backup */
-let csv_data = fs.readFileSync( 'data/' + config.backup, 'utf8' ).replace( /"/g, '' ).replace( /\r/g, '' ).split( '\n' );
+let csv_data = fs.readFileSync( `data/` + config.backup, 'utf8' ).replace( /"/g, '' ).replace( /\r/g, '' ).split( '\n' );
 
 const keys = csv_data[0].split( ',' );
 csv_data = csv_data.slice( 1 );

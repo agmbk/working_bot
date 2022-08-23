@@ -2,13 +2,15 @@ import config from '../config.json' assert { type: 'json' };
 import database from '../data/database.js';
 import getDate from './getDate.js';
 
+/**
+ * @name save_data
+ * @description Save data it into the DB row corresponding to the id
+ *
+ * @param {Object} data data to save
+ * @param {int} id DB row id (account id)
+ * @returns {void}
+ */
 export default async function save_data(data, id) {
-	/**
-	 * Save data in the corresponding DB row
-	 * data: The data to save
-	 * id: The DB row id
-	 * @type {string}
-	 */
 	try {
 		const query = `
             UPDATE ${config.table}
