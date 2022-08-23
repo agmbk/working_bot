@@ -1,0 +1,19 @@
+{
+  "table": "public.ouranos_working_bot",
+  "backup": "ouranos_working_bot.csv",
+  "cooldown": 10e3,
+  "one_hour": 3.6e6,
+  "one_minute": 6e4,
+  "pay_interval": 172800000,
+  "work_interval": 3.6e6,
+  "cant_c_me": 0,
+  "retry": 300000,
+  "night": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ]
+}
