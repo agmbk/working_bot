@@ -103,7 +103,7 @@ export default async function work(account, data, timeout) {
 					for (const message of json) {
 						if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
 							const mess_timestamp = Date.parse( getDate( message.timestamp ) );
-							console.log( 'timestamp', mess_timestamp );
+							console.log( 'timestamp', mess_timestamp, new Date(mess_timestamp));
 							if (mess_timestamp > data.date.getTime()) return parseInt( message.content.split( '**' )[1] );
 						}
 					}
