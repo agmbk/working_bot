@@ -4,6 +4,10 @@
  *
  * @returns {string} date to string
  */
-export default function getDate() {
-	return new Date().toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} );
+export default function getDate(date = '') {
+	if (date) {
+		return new Date().toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} );
+	} else {
+		return new Date( date ).toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} );
+	}
 }
