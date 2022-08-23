@@ -9,20 +9,26 @@ let query, res;
 
 /* Create the DB if not exist */
 query = `
-	CREATE TABLE IF NOT EXISTS ${config.table}
-	( /* ! Add new column to insert into ! */
-	    id VARCHAR(20) NOT NULL,
-	    money_total integer NOT NULL,
-	    money integer NOT NULL,
-	    money_mean integer NOT NULL,
-	    total_days_count integer NOT NULL,
-	    count_total integer NOT NULL,
-	    count integer NOT NULL,
-	    count_mean integer NOT NULL,
-	    error integer NOT NULL,
-	    date timestamp without time zone NOT NULL,
-	    CONSTRAINT ouranos_working_bot_pkey PRIMARY KEY (id)
-	)`;
+    CREATE TABLE IF NOT EXISTS ${config.table}
+    ( /* ! Add new column to insert into ! */
+        id VARCHAR
+    (
+        20
+    ) NOT NULL,
+        money_total integer NOT NULL,
+        money integer NOT NULL,
+        money_mean integer NOT NULL,
+        total_days_count integer NOT NULL,
+        count_total integer NOT NULL,
+        count integer NOT NULL,
+        count_mean integer NOT NULL,
+        error integer NOT NULL,
+        date timestamp without time zone NOT NULL,
+        CONSTRAINT ouranos_working_bot_pkey PRIMARY KEY
+    (
+        id
+    )
+        )`;
 
 await database.query( query );
 
@@ -44,7 +50,9 @@ csv_data.forEach( (line, line_i) => {
 /* For each account, set up a DB row, and add it to the data array */
 const data = await Promise.all( accounts.map( async (account, id) => {
 	
-	query = `SELECT * FROM ${config.table} WHERE  id='${account.id}'`;
+	query = `SELECT *
+             FROM ${config.table}
+             WHERE id = '${account.id}'`;
 	res = await database.query( query );
 	
 	/* Create the row if row doesn't exist */
@@ -54,15 +62,21 @@ const data = await Promise.all( accounts.map( async (account, id) => {
 		
 		if (backup) {
 			console.warn( `Row ${accounts[id].id} is empty, backup recovery` );
-			query = `INSERT INTO ${config.table} VALUES ('${account.id}', ${backup.money_total}, ${backup.money}, ${backup.money_mean}, ${backup.total_days_count}, ${backup.count_total}, ${backup.count}, ${backup.count_mean}, ${backup.error}, '${backup.date}')`;
+			query = `INSERT INTO ${config.table}
+                     VALUES ('${account.id}', ${backup.money_total}, ${backup.money}, ${backup.money_mean},
+                             ${backup.total_days_count}, ${backup.count_total}, ${backup.count}, ${backup.count_mean},
+                             ${backup.error}, '${backup.date}')`;
 			
 		} else {
 			console.warn( `Row ${accounts[id].id} is empty, init a new row` );
-			query = `INSERT INTO ${config.table} VALUES ('${account.id}', 0, 0, 0, 0, 0, 0, 0, 0, 0)`;
+			query = `INSERT INTO ${config.table}
+                     VALUES ('${account.id}', 0, 0, 0, 0, 0, 0, 0, 0, 0)`;
 		}
 		
 		await database.query( query );
-		query = `SELECT * FROM ${config.table} WHERE  id='${account.id}'`;
+		query = `SELECT *
+                 FROM ${config.table}
+                 WHERE id = '${account.id}'`;
 		res = await database.query( query );
 	}
 	
