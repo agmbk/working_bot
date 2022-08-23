@@ -32,7 +32,7 @@ function getDate() {
 
 (async function () {
 	function resFormat(res) {
-		return `OK: ${res.ok} | Status: ${res.status === 204 ? res.status.toString().green() : res.status.toString().red()} ${res.status === 204 ? res.statusText.toString().green() : res.statusText.toString().red()}`;
+		return `OK: ${res.ok ? res.ok.toString().green() : res.ok.toString().red()} | Status: ${res.status === 204 ? `${res.status} ${res.statusText}`.green() : `${res.status} ${res.statusText}`.red()}`;
 	}
 	
 	try {
@@ -364,7 +364,7 @@ function getDate() {
 								money = parseInt( message.content.split( '**' )[1] );
 							}
 						}
-						
+						console.log( 'money', money );
 						if (money === 0) {
 							console.warn( `${payer.id.red()} | Money laundering cancelled : ${'You got no money'.red()} !` );
 							setTimeout( () => pay( payer, receiver ), pay_interval + cant_c_me * Math.random() );
