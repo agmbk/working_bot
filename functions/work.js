@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 import config from '../config.json' assert { type: 'json' };
 import getDate from './getDate.js';
 import mainAccount from '../data/mainAccount.js';
-import save_data from './saveData.js';
+import saveData from './saveData.js';
 
 function resFormat(res) {
 	return `OK: ${res.ok ? res.ok.toString().green() : res.ok.toString().red()} | Status: ${res.status === 204 ? `${res.status} ${res.statusText}`.green() : `${res.status} ${res.statusText}`.red()}`;
@@ -60,11 +60,11 @@ export default async function work(account, data, timeout) {
 			'method': 'POST',
 			'mode': 'cors',
 		} ).then( async res => {
-			/* To compare with the bot message timestamp */
-			const timestamp = new Date().setMilliseconds( -config.cooldown );
 			
 			/* Calculate mean of the day */
-			if (new Date( Date.parse( getDate() ) ).getDate() !== data.date.getDate()) {
+			const date_now = new Date( Date.parse( getDate() ) );
+			if (data.date.getTime() < date_now.setDate( date_now.getDate() - 1 )) {
+				console.log( 'new day'.red(), data.date.getTime(), date_now );
 				data.date = new Date().getDay();
 				data.total_days_count += 1;
 				data.count_mean += ((data.count - data.count_mean) / data.total_days_count);
@@ -81,7 +81,7 @@ export default async function work(account, data, timeout) {
 				 * Fetch money gain
 				 */
 				await new Promise( resolve => setTimeout( resolve, config.cooldown / 2 ) );
-				money = await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {
+				money = await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=30`, {
 					'headers': {
 						'accept': '*/*',
 						'accept-language': 'fr,fr-FR;q=0.9',
@@ -102,7 +102,8 @@ export default async function work(account, data, timeout) {
 					/* Get the last message > timestamp - cooldown */
 					for (const message of json) {
 						if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
-							if (new Date( message.timestamp ).getTime() > timestamp) return parseInt( message.content.split( '**' )[1] );
+							console.log( 'timestamp', message.timestamp );
+							if (new Date( message.timestamp ).getTime() > data.date.getTime()) return parseInt( message.content.split( '**' )[1] );
 						}
 					}
 					return 0;
@@ -116,7 +117,7 @@ export default async function work(account, data, timeout) {
 				console.log( `${account.id.green()} | Money: ${data.money.toString().blue()} | Mean: ${data.money_mean} | Gain: ${money.toString().green()} | Count: ${data.count} | Date: ${getDate()}` );
 				
 				const timeout = config.work_interval + config.cooldown * Math.random();
-				await save_data( 'data', account.id );
+				await saveData( data, account.id );
 				return work( account, data, timeout );
 				
 			} else {

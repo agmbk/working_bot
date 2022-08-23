@@ -11,7 +11,10 @@ let query, res;
 query = `
     CREATE TABLE IF NOT EXISTS ${config.table}
     ( /* ! Add new column to insert into ! */
-        id VARCHAR (20) NOT NULL,
+        id VARCHAR
+    (
+        20
+    ) NOT NULL,
         money_total integer NOT NULL,
         money integer NOT NULL,
         money_mean integer NOT NULL,
@@ -21,7 +24,10 @@ query = `
         count_mean integer NOT NULL,
         error integer NOT NULL,
         date timestamp without time zone NOT NULL,
-        CONSTRAINT ouranos_working_bot_pkey PRIMARY KEY (id)
+        CONSTRAINT ouranos_working_bot_pkey PRIMARY KEY
+    (
+        id
+    )
         )`;
 
 await database.query( query );

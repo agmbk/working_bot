@@ -3,14 +3,14 @@ import database from '../data/database.js';
 import getDate from './getDate.js';
 
 /**
- * @name save_data
+ * @name saveData
  * @description Save data it into the DB row corresponding to the id
  *
  * @param {Object} data data to save
  * @param {int} id DB row id (account id)
  * @returns {void}
  */
-export default async function save_data(data, id) {
+export default async function saveData(data, id) {
 	try {
 		const query = `
             UPDATE ${config.table}
@@ -21,7 +21,7 @@ export default async function save_data(data, id) {
                 count_total      = ${data.count_total},
                 count            = ${data.count},
                 count_mean       = ${data.count_mean},
-                error            = ${10},
+                error            = ${data.error},
                 date             = '${getDate()}'
             WHERE id = '${id}'
 		`;
