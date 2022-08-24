@@ -29,7 +29,7 @@ export default async function work(account, data, timeout) {
 	if (config.night.includes( new Date( Date.parse( getDate() ) ).getHours() )) {
 		console.log( `It's the night` );
 		const timeout = config.work_interval + config.cooldown * Math.random();
-		if (Math.random() > 0.5) return work( account, data, timeout );
+		if (Math.random() > 0.2) return work( account, data, timeout );
 	}
 	
 	/* Secondary accounts work 2 time less */
@@ -80,7 +80,7 @@ export default async function work(account, data, timeout) {
 				/**
 				 * Fetch money gain
 				 */
-				await new Promise( resolve => setTimeout( resolve, config.cooldown / 2 ) );
+				await new Promise( resolve => setTimeout( resolve, config.one_second * 5 ) );
 				money = await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=30`, {
 					'headers': {
 						'accept': '*/*',
