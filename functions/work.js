@@ -26,16 +26,26 @@ export default async function work(account, data, timeout) {
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
 	/* Work less at night */
-	if (config.night.includes( new Date( Date.parse( getDate() ) ).getHours() )) {
+	const currentHours = new Date( Date.parse( getDate() ) ).getHours();
+	if (config.night.includes( currentHours )) {
 		console.log( `It's the night` );
-		const timeout = config.work_interval + config.cooldown * Math.random();
-		if (Math.random() > 0.2) return work( account, data, timeout );
+		
+		if (account.id !== mainAccount.id) {
+			// let date = new Date(Date.parse(getDate()))
+			// date.setHours(date.getHours() + (config.night.at(-1) - currentHours))
+			// timeout = Date.parse(getDate())  + config.cooldown * Math.random();
+			timeout = config.work_interval + config.cooldown * Math.random();
+			return work( account, data, timeout );
+		} else if (Math.random() > 0.3) {
+			const timeout = config.work_interval + config.cooldown * Math.random();
+			return work( account, data, timeout );
+		}
 	}
 	
 	/* Secondary accounts work 2 time less */
 	if (account.id !== mainAccount.id) {
 		const timeout = config.work_interval + config.cooldown * Math.random();
-		if (Math.random() > 0.5) return work( account, data, timeout );
+		if (Math.random() > 0.3) return work( account, data, timeout );
 	}
 	
 	try {
@@ -64,7 +74,7 @@ export default async function work(account, data, timeout) {
 			/* Calculate mean of the day */
 			const date_now = new Date( Date.parse( getDate() ) );
 			date_now.setDate( date_now.getDate() - 1 );
-			if (data.date.getDate() < date_now.getDate()) {
+			if (data.date.getDate() === date_now.getDate() || data.date.getDate() < date_now.getDate()) {
 				console.log( 'new day'.red(), data.date.getTime(), date_now );
 				data.total_days_count += 1;
 				data.count_mean += ((data.count - data.count_mean) / data.total_days_count);
@@ -103,7 +113,7 @@ export default async function work(account, data, timeout) {
 					for (const message of json) {
 						if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
 							const mess_timestamp = Date.parse( getDate( message.timestamp ) );
-							console.log( `Last money message ${new Date( mess_timestamp )} (${parseInt( message.content.split( '**' )[1] )})` );
+							console.log( `Last money message ${new Date( mess_timestamp )} (${parseInt( message.content.split( '**' )[1] )} | Date : ${getDate()})` );
 							if (mess_timestamp > data.date.getTime()) return parseInt( message.content.split( '**' )[1] );
 						}
 					}
