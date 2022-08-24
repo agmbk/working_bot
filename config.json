@@ -1,7 +1,7 @@
 {
   "table": "public.ouranos_working_bot",
   "backup": "ouranos_working_bot.csv",
-  "cooldown": 10e3,
+  "cooldown": 2e6,
   "one_hour": 3.6e6,
   "one_minute": 6e4,
   "one_second": 1e3,

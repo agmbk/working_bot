@@ -74,6 +74,7 @@ export default async function work(account, data, timeout) {
 			/* Calculate mean of the day */
 			const date_now = new Date( Date.parse( getDate() ) );
 			date_now.setDate( date_now.getDate() - 1 );
+			console.log(data.date.getDate() , date_now.getDate() , data.date.getDate() , date_now.getDate());
 			if (data.date.getDate() === date_now.getDate() || data.date.getDate() < date_now.getDate()) {
 				console.log( 'new day'.red(), data.date.getTime(), date_now );
 				data.total_days_count += 1;
