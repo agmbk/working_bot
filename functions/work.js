@@ -112,8 +112,8 @@ export default async function work(account, data, timeout) {
 					for (const message of json) {
 						if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
 							money_mess_date = getDateObject( message.timestamp );
-							console.log( `Money message ${money_mess_date} (${parseInt( message.content.split( '**' )[1] )} | Date : ${getDate()}), Last in DB ${getDateObject( data.date )}` );
-							if (money_mess_date > getDateObject( data.date )) return parseInt( message.content.split( '**' )[1] );
+							console.log( `Money message ${money_mess_date} (${parseInt( message.content.split( '**' )[1] )} | Date : ${getDate()}), Last in DB ${data.date}` );
+							if (money_mess_date > data.date) return parseInt( message.content.split( '**' )[1] );
 						}
 					}
 					return 0;
