@@ -73,9 +73,10 @@ export default async function work(account, data, timeout) {
 			
 			/* Calculate mean of the day */
 			const current_date = new Date( Date.parse( getDate() ) );
-			console.log(data.date.getDate() , current_date.getDate(), data.date.setDate(data.date.getDate() + 1), current_date);
-			if (data.date.getDate() < current_date.getDate() || data.date.setDate(data.date.getDate() + 1) < current_date ) {
-				console.log( 'new day'.red());
+			const next_day = data.date.setDate( data.date.getDate() + 1 );
+			console.log( data.date.getDate(), current_date.getDate(), next_day, current_date );
+			if (data.date.getDate() < current_date.getDate() || next_day < current_date) {
+				console.log( 'new day'.red() );
 				data.total_days_count += 1;
 				data.count_mean += ((data.count - data.count_mean) / data.total_days_count);
 				data.money_mean += ((data.money - data.money_mean) / data.total_days_count);
@@ -121,9 +122,9 @@ export default async function work(account, data, timeout) {
 					
 				} ) );
 			}
-			data.date = new Date( Date.parse( getDate() ) );
 			
 			if (money && res.ok) {
+				data.date = new Date( Date.parse( getDate() ) );
 				data.money_total += money;
 				data.money += money;
 				
