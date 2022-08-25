@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import config from '../config.json' assert { type: 'json' };
-import { getDate, isCurrentDay } from './dateHandler.js';
+import { getDate, getDateObject, isCurrentDay } from './dateHandler.js';
 import mainAccount from '../data/mainAccount.js';
 import saveData from './saveData.js';
 
@@ -22,11 +22,11 @@ function resFormat(res) {
 export default async function work(account, data, timeout) {
 	
 	timeout += config.cant_c_me * Math.random();
-	console.log( account.id, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins' );
+	console.log( account.id, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', getDateObject().setMilliseconds( getDateObject().getMilliseconds() + timeout ) );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
 	/* Work less at night */
-	const currentHours = new Date( Date.parse( getDate() ) ).getHours();
+	const currentHours = getDateObject().getHours();
 	if (config.night.includes( currentHours )) {
 		console.log( `It's the night` );
 		
@@ -111,9 +111,9 @@ export default async function work(account, data, timeout) {
 					/* Get the last message > timestamp - cooldown */
 					for (const message of json) {
 						if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
-							money_mess_date = Date.parse( getDate( message.timestamp ) );
-							console.log( `Last money message ${new Date( money_mess_date )} (${parseInt( message.content.split( '**' )[1] )} | Date : ${getDate()})` );
-							if (money_mess_date > data.date.getTime()) return parseInt( message.content.split( '**' )[1] );
+							money_mess_date = getDateObject( message.timestamp );
+							console.log( `Money message ${money_mess_date} (${parseInt( message.content.split( '**' )[1] )} | Date : ${getDate()}), Last in DB ${getDateObject( data.date )}` );
+							if (money_mess_date > getDateObject( data.date )) return parseInt( message.content.split( '**' )[1] );
 						}
 					}
 					return 0;
@@ -122,7 +122,7 @@ export default async function work(account, data, timeout) {
 			}
 			
 			if (money && res.ok) {
-				data.date = new Date( Date.parse( getDate() ) );
+				data.date = getDateObject();
 				data.money_total += money;
 				data.money += money;
 				

@@ -1,5 +1,5 @@
 import config from '../config.json' assert { type: 'json' };
-import getDate from './dateHandler.js';
+import getDate, { getDateObject } from './dateHandler.js';
 import fetch from 'node-fetch';
 
 /**
@@ -12,8 +12,7 @@ import fetch from 'node-fetch';
  */
 export default async function pay(payer, receiver) {
 	
-	const hour = new Date( Date.parse( getDate() ) ).getHours();
-	if (2 < hour && hour < 7) {
+	if (config.night.includes( getDateObject().getHours() )) {
 		setTimeout( () => pay( payer, receiver ), config.pay_interval + config.cant_c_me * Math.random() );
 	}
 	try {
