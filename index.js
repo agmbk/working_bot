@@ -1,7 +1,7 @@
 import config from './config.json' assert { type: 'json' };
 import data from './data/databaseData.js';
 import accounts from './data/accounts.js';
-import { getDate } from './functions/dateHandler.js';
+import { getDate, getDateObject, isCurrentDay } from './functions/dateHandler.js';
 import work from './functions/work.js';
 // import pay from './functions/pay.js';
 import './data/color.js';
@@ -34,7 +34,7 @@ try {
 		if (wait_time > 0) {
 			const timeout = wait_time * config.one_minute + config.cooldown * Math.random();
 			console.log( `${account.id.cyan()} will works in ${wait_time.toFixed( 0 ).cyan()} mins | Date: ${getDate()}` );
-			
+			console.log(getDateObject(), getDate(), isCurrentDay(getDateObject()), isCurrentDay(getDate()), isCurrentDay(account_data.date));
 			work( account, account_data, timeout );
 			
 		} else {

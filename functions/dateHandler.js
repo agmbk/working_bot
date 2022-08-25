@@ -11,7 +11,7 @@ export function getDate(date = null) {
 		if (typeof date == 'string') {
 			result = new Date( Date.parse( date ) ).toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} );
 			
-		} else if (date instanceof Date || date instanceof 'number') {
+		} else if (date instanceof Date || typeof date === 'number') {
 			result = new Date( date ).toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} );
 			
 		} else {
@@ -26,11 +26,22 @@ export function getDate(date = null) {
 		
 	}
 	if (result === 'Invalid Date') {
-		throw new Error( 'Invalid Date' );
+		throw new Error( `Invalid date: ${date}` );
 		
 	} else {
 		return result;
 	}
+}
+
+/**
+ * @name getDateObject
+ * @exports
+ * @description Get french date Object
+ * @param {Date || string} date
+ * @returns {Date} date to Date
+ */
+export function getDateObject(date = null) {
+	return new Date( Date.parse( getDate( date ) ) );
 }
 
 /**
@@ -41,18 +52,8 @@ export function getDate(date = null) {
  * @returns {boolean}
  */
 export function isCurrentDay(date) {
-	let compared_date;
-	if (typeof date == 'string') {
-		compared_date = new Date( Date.parse( date ) );
-		
-	} else if (date instanceof Date || date instanceof 'number') {
-		compared_date = new Date( date );
-		
-	} else {
-		throw new Error( 'Invalid type' );
-	}
-	
-	const current_date = new Date( Date.parse( getDate() ) );
+	const compared_date = getDateObject( date );
+	const current_date = getDateObject();
 	
 	return compared_date.getDate() !== current_date.getDate() || compared_date.setDate( compared_date.getDate() + 1 ) < current_date.getTime() || compared_date.setDate( compared_date.getDate() - 2 ) > current_date.getTime();
 }
