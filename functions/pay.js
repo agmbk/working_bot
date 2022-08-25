@@ -1,5 +1,5 @@
 import config from '../config.json' assert { type: 'json' };
-import getDate from './getDate.js';
+import getDate from './dateHandler.js';
 import fetch from 'node-fetch';
 
 /**

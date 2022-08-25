@@ -1,6 +1,6 @@
 import config from '../config.json' assert { type: 'json' };
 import database from '../data/database.js';
-import getDate from './getDate.js';
+import { getDate } from './dateHandler.js';
 
 /**
  * @name saveData
@@ -10,7 +10,7 @@ import getDate from './getDate.js';
  * @param {int} id DB row id (account id)
  * @returns {void}
  */
-export default async function saveData(data, id) {
+export default async function saveData(data, id, date) {
 	try {
 		const query = `
             UPDATE ${config.table}
@@ -22,7 +22,7 @@ export default async function saveData(data, id) {
                 count            = ${data.count},
                 count_mean       = ${data.count_mean},
                 error            = ${data.error},
-                date             = '${getDate()}'
+                date             = '${getDate( date )}'
             WHERE id = '${id}'
 		`;
 		await database.query( query );

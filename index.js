@@ -2,7 +2,7 @@ import config from './config.json' assert { type: 'json' };
 import data from './data/databaseData.js';
 import accounts from './data/accounts.js';
 import mainAccount from './data/mainAccount.js';
-import getDate from './functions/getDate.js';
+import { getDate } from './functions/dateHandler.js';
 import work from './functions/work.js';
 // import pay from './functions/pay.js';
 import './data/color.js';
@@ -11,9 +11,7 @@ import './data/color.js';
 try {
 	/** DB data */
 	
-	console.log( '*** Database data ***'.blue() );
-	
-	console.log( data );
+	console.log( '*** Database data ***'.blue(), data );
 	
 	/** Workers */
 	
@@ -50,6 +48,5 @@ try {
 	console.log( '*** Work result ***'.blue() );
 	
 } catch (e) {
-	/* Can be DB error */
 	console.error( 'GLOBAL CRASH'.red(), e );
 }

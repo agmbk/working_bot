@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import config from '../config.json' assert { type: 'json' };
-import getDate from './getDate.js';
+import { getDate, isCurrentDay } from './dateHandler.js';
 import mainAccount from '../data/mainAccount.js';
 import saveData from './saveData.js';
 
@@ -72,10 +72,7 @@ export default async function work(account, data, timeout) {
 		} ).then( async res => {
 			
 			/* Calculate mean of the day */
-			const current_date = new Date( Date.parse( getDate() ) );
-			const next_day = data.date.setDate( data.date.getDate() + 1 );
-			console.log( data.date.getDate(), current_date.getDate(), next_day, current_date );
-			if (data.date.getDate() < current_date.getDate() || next_day < current_date) {
+			if (isCurrentDay( data.date )) {
 				console.log( 'new day'.red() );
 				data.total_days_count += 1;
 				data.count_mean += ((data.count - data.count_mean) / data.total_days_count);
@@ -84,6 +81,7 @@ export default async function work(account, data, timeout) {
 				data.count = 0;
 			}
 			let money = 0;
+			let money_mess_date;
 			if (res.ok) {
 				data.count += 1;
 				data.count_total += 1;
@@ -113,9 +111,9 @@ export default async function work(account, data, timeout) {
 					/* Get the last message > timestamp - cooldown */
 					for (const message of json) {
 						if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
-							const mess_timestamp = Date.parse( getDate( message.timestamp ) );
-							console.log( `Last money message ${new Date( mess_timestamp )} (${parseInt( message.content.split( '**' )[1] )} | Date : ${getDate()})` );
-							if (mess_timestamp > data.date.getTime()) return parseInt( message.content.split( '**' )[1] );
+							money_mess_date = Date.parse( getDate( message.timestamp ) );
+							console.log( `Last money message ${new Date( money_mess_date )} (${parseInt( message.content.split( '**' )[1] )} | Date : ${getDate()})` );
+							if (money_mess_date > data.date.getTime()) return parseInt( message.content.split( '**' )[1] );
 						}
 					}
 					return 0;
@@ -131,7 +129,7 @@ export default async function work(account, data, timeout) {
 				console.log( `${account.id.green()} | Money: ${data.money.toString().blue()} | Mean: ${data.money_mean} | Gain: ${money.toString().green()} | Count: ${data.count} | Date: ${getDate()}` );
 				
 				const timeout = config.work_interval + config.cooldown * Math.random();
-				await saveData( data, account.id );
+				await saveData( data, account.id, money_mess_date );
 				return work( account, data, timeout );
 				
 			} else {
