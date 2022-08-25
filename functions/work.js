@@ -72,10 +72,10 @@ export default async function work(account, data, timeout) {
 		} ).then( async res => {
 			
 			/* Calculate mean of the day */
-			const date_now = new Date( Date.parse( getDate() ) );
-			date_now.setDate( date_now.getDate() - 1 );
-			if (data.date.getDate() === date_now.getDate() || data.date < date_now) {
-				console.log( 'new day'.red(), data.date.getDate(), date_now.getDate(), data.date, date_now );
+			const current_date = new Date( Date.parse( getDate() ) );
+			console.log(data.date.getDate() , current_date.getDate(), data.date.setDate(data.date.getDate() + 1), current_date);
+			if (data.date.getDate() < current_date.getDate() || data.date.setDate(data.date.getDate() + 1) < current_date ) {
+				console.log( 'new day'.red());
 				data.total_days_count += 1;
 				data.count_mean += ((data.count - data.count_mean) / data.total_days_count);
 				data.money_mean += ((data.money - data.money_mean) / data.total_days_count);
