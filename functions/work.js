@@ -36,7 +36,7 @@ export default async function work(account, data, timeout) {
 			// timeout = Date.parse(getDate())  + config.cooldown * Math.random();
 			timeout = config.work_interval + config.cooldown * Math.random();
 			return work( account, data, timeout );
-		} else if (Math.random() > 0.3) {
+		} else if (Math.random() > 0.2) {
 			const timeout = config.work_interval + config.cooldown * Math.random();
 			return work( account, data, timeout );
 		}
@@ -45,7 +45,7 @@ export default async function work(account, data, timeout) {
 	/* Secondary accounts work 2 time less */
 	if (account.id !== mainAccount.id) {
 		const timeout = config.work_interval + config.cooldown * Math.random();
-		if (Math.random() > 0.3) return work( account, data, timeout );
+		if (Math.random() > 0.2) return work( account, data, timeout );
 	}
 	
 	try {
