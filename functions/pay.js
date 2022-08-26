@@ -55,7 +55,10 @@ export default async function pay(payer, receiver) {
 				'body': null,
 				'method': 'GET',
 				'mode': 'cors',
-			} ).then( res => {console.log('money messages'.red(), res.ok, res.status, res.statusText);return res.json();} );
+			} ).then( res => {
+				console.log( 'money messages'.red(), res.ok, res.status, res.statusText );
+				return res.json();
+			} );
 			
 			/* Try to get the last payement */
 			for (const message of messages) {
@@ -115,8 +118,8 @@ export default async function pay(payer, receiver) {
 				} );
 			}
 		}
-		/* Probably invalid account */
-		console.error( `${payer.id.red()} fetching money failed | ${fetchResFormat( res )} | Date: ${getDate()}` );
+		/* Probably invalid account or banned */
+		console.error( `${payer.id.red()} fetching money failed (account banned ?) | ${fetchResFormat( res )} | Date: ${getDate()}` );
 		setTimeout( () => pay( payer, receiver ), config.retry + config.cant_c_me * Math.random() );
 		
 	} catch (e) {
