@@ -6,6 +6,7 @@ import work from './functions/work.js';
 // import pay from './functions/pay.js';
 import './data/color.js';
 import pay from './functions/pay.js';
+import mainAccount from './data/mainAccount.js';
 
 
 try {

@@ -2,7 +2,6 @@
  * @name getDate
  * @exports
  * @description Get french date, formatted in en-US for Postgres
- * @param {Date || string} date
  * @returns {string} date to string
  */
 export function getDate(date) {
@@ -12,16 +11,8 @@ export function getDate(date) {
 		throw new Error( 'Too many arguments' );
 		
 	} else if (arguments.length === 1 && arguments[0].length) {
-		if (typeof date == 'string') {
-			result = new Date( Date.parse( date ) ).toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} );
-			
-		} else if (date instanceof Date || typeof date === 'number') {
-			result = new Date( date ).toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} );
-			
-		} else {
-			throw new Error( `Invalid date: ${date}` );
-			
-		}
+		result = new Date( date ).toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} );
+		
 	} else {
 		result = new Date().toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} );
 		
