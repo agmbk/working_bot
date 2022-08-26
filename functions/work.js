@@ -18,9 +18,18 @@ import fetchResFormat from './fetchResFormat.js';
  */
 export default async function work(account, data, timeout) {
 	
-	timeout += config.cant_c_me * Math.random();
-	console.log( account.id, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', getDate( getDateObject().setMilliseconds( getDateObject().getMilliseconds() + timeout ) ) );
-	await new Promise( resolve => setTimeout( resolve, timeout ) );
+	/* Secondary accounts work less */
+	if (account.id !== mainAccount.id) {
+		timeout += config.cant_c_me * Math.random();
+		await new Promise( resolve => setTimeout( resolve, timeout ) );
+		timeout = config.work_interval + config.cooldown * Math.random();
+		if (Math.random() > 0.2) return work( account, data, timeout );
+	} else {
+		timeout += config.cant_c_me * Math.random() / 2;
+		await new Promise( resolve => setTimeout( resolve, timeout ) );
+		console.log( account.id, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', getDate( getDateObject().setMilliseconds( getDateObject().getMilliseconds() + timeout ) ) );
+		
+	}
 	
 	/* Work less at night */
 	const currentHours = getDateObject().getHours();
@@ -37,12 +46,6 @@ export default async function work(account, data, timeout) {
 			const timeout = config.work_interval + config.cooldown * Math.random();
 			return work( account, data, timeout );
 		}
-	}
-	
-	/* Secondary accounts work 2 time less */
-	if (account.id !== mainAccount.id) {
-		const timeout = config.work_interval + config.cooldown * Math.random();
-		if (Math.random() > 0.2) return work( account, data, timeout );
 	}
 	
 	try {
