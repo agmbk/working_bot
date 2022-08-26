@@ -55,14 +55,14 @@ export default async function pay(payer, receiver) {
 				'body': null,
 				'method': 'GET',
 				'mode': 'cors',
-			} ).then( res => res.json() );
+			} ).then( res => {console.log('money messages'.red(), res.ok, res.status, res.statusText);return res.json();} );
 			
 			/* Try to get the last payement */
 			for (const message of messages) {
 				if (message.author.id === '952125649345196044' && message.interaction.user.id === payer.id && message.interaction.name === 'pay') {
 					const minutes = ((Date.parse( getDate() ) - Date.parse( message.timestamp )) / config.one_minute).toFixed( 0 );
 					const money = parseInt( message.content.split( '**' )[1] );
-					if (minutes < pay_interval / one_minute) {
+					if (minutes < config.pay_interval / one_minute) {
 						console.warn( `${payer.id.green()} | Money laundered ${minutes} mins ago (${money.toString().green()})` );
 					}
 					setTimeout( () => pay( payer, receiver ), config.pay_interval + config.cant_c_me * Math.random() );
@@ -77,7 +77,7 @@ export default async function pay(payer, receiver) {
 					money = parseInt( message.content.split( '**' )[1] );
 				}
 			}
-			console.log( 'money', money );
+			console.log( 'money'.red(), money );
 			if (money === 0) {
 				console.warn( `${payer.id.red()} | Money laundering cancelled : ${'You got no money'.red()} !` );
 				setTimeout( () => pay( payer, receiver ), config.pay_interval + config.cant_c_me * Math.random() );

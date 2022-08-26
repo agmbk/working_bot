@@ -24,11 +24,11 @@ export default async function work(account, data, timeout) {
 		await new Promise( resolve => setTimeout( resolve, timeout ) );
 		timeout = config.work_interval + config.cooldown * Math.random();
 		if (Math.random() > 0.2) return work( account, data, timeout );
+		
 	} else {
 		timeout += config.cant_c_me * Math.random() / 2;
 		await new Promise( resolve => setTimeout( resolve, timeout ) );
 		console.log( account.id, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', getDate( getDateObject().setMilliseconds( getDateObject().getMilliseconds() + timeout ) ) );
-		
 	}
 	
 	/* Work less at night */

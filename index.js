@@ -21,7 +21,7 @@ try {
 	accounts.map( account => {
 		if (account.pay) {
 			console.log( `${account.id.cyan()} is paying ${mainAccount.id.cyan()}` );
-			setTimeout( () => pay( account, mainAccount ), config.one_hour );
+			setTimeout( () => pay( account, mainAccount ), /*config.one_hour*/ );
 		}
 	} );
 	
