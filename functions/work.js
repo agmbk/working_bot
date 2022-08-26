@@ -128,14 +128,14 @@ export default async function work(account, data, timeout) {
 				data.money_total += money;
 				data.money += money;
 				
-				console.log( `${account.id.green()} | Money: ${data.money.toString().blue()} | Mean: ${data.money_mean} | Gain: ${money.toString().green()} | Count: ${data.count} | Date: ${getDate()}` );
+				console.log( `${account.id.green()} | Money: ${data.money.toString().blue()} | Mean: ${data.money_mean} | Gain: ${money.toString().green()} | Count: ${data.count} | Date: ${getDateObject()}` );
 				
 				const timeout = config.work_interval + config.cooldown * Math.random();
 				await saveData( data, account.id, money_mess_date );
 				return work( account, data, timeout );
 				
 			} else {
-				console.warn( `${account.id.red()} failed ( ${fetchResFormat( res )} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data.error} | Date: ${getDate()} )` );
+				console.warn( `${account.id.red()} failed ( ${fetchResFormat( res )} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data.error} | Date: ${getDateObject()} )` );
 				data.error += 1;
 				
 				const timeout = config.retry + config.cooldown * Math.random();
