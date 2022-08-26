@@ -118,7 +118,7 @@ export default async function work(account, data, timeout) {
 				} ) );
 			}
 			
-			if (money && res.ok) {
+			if (money && res.ok && money_mess_date) {
 				data.date = getDateObject();
 				data.money_total += money;
 				data.money += money;

@@ -8,6 +8,7 @@ import { getDate } from './dateHandler.js';
  *
  * @param {Object} data data to save
  * @param {int} id DB row id (account id)
+ * @param {Date} date last money message date
  * @returns {void}
  */
 export default async function saveData(data, id, date) {
