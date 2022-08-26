@@ -41,11 +41,11 @@ export function getDateObject(date = '') {
  * @name isCurrentDay
  * @exports
  * @description Check if a date is the same day as the current date
- * @param {Date || string} date
+ * @param {Date} date
  * @returns {boolean}
  */
 export function isCurrentDay(date) {
-	let compared_date = getDateObject( date ), current_date = getDateObject();
+	let compared_date = date , current_date = getDateObject();
 	console.log( 'isCurrentDay'.red(), compared_date, current_date, compared_date.getDate(), current_date.getDate(), compared_date.getMonth(), current_date.getMonth(), compared_date.getFullYear(), current_date.getFullYear() );
 	return !(
 		compared_date.getDate() === current_date.getDate() &&
