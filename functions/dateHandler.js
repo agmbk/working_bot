@@ -46,7 +46,7 @@ export function getDateObject(date = '') {
  */
 export function isCurrentDay(date) {
 	let compared_date = getDateObject( date ), current_date = getDateObject();
-	console.log( 'isCurrentDay'.red(), compared_date, current_date, compared_date.getDate(), current_date.getDate(), compared_date.getMonth(), current_date.getMonth(), compared_date.getFullYear(), current_date.getFullYear() );
+	console.log( 'isCurrentDay'.red(), 'date', date, '1', compared_date, '2', current_date, compared_date.getDate(), current_date.getDate(), compared_date.getMonth(), current_date.getMonth(), compared_date.getFullYear(), current_date.getFullYear() );
 	return !(
 		compared_date.getDate() === current_date.getDate() &&
 		compared_date.getMonth() === current_date.getMonth() &&
