@@ -5,7 +5,7 @@
   "one_hour": 3.6e6,
   "one_minute": 6e4,
   "one_second": 1e3,
-  "pay_interval": 172800000,
+  "pay_interval": 3e8,
   "work_interval": 3.6e6,
   "cant_c_me": 1e6,
   "retry": 300000,

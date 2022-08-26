@@ -5,6 +5,7 @@ import { getDate } from './functions/dateHandler.js';
 import work from './functions/work.js';
 // import pay from './functions/pay.js';
 import './data/color.js';
+import pay from './functions/pay.js';
 
 
 try {
@@ -19,8 +20,8 @@ try {
 	/* Pay */
 	accounts.map( account => {
 		if (account.pay) {
-			// console.log( `${account.id.cyan()} is paying ${mainAccount.id.cyan()}` );
-			// setTimeout( () => pay( account, mainAccount ), one_hour );
+			console.log( `${account.id.cyan()} is paying ${mainAccount.id.cyan()}` );
+			setTimeout( () => pay( account, mainAccount ), one_hour );
 		}
 	} );
 	
