@@ -26,6 +26,27 @@ export function getDate(date) {
 }
 
 /**
+ * @name getUTCDate
+ * @exports
+ * @description Get french date, to UTC string
+ * @returns {string} date to string
+ */
+export function getUTCDateString(date) {
+	return new Date(date.setUTCDate(1)).toUTCString();
+}
+
+/**
+ * @name getUTCDate
+ * @exports
+ * @description Get french date, to UTC Date
+ * @returns {Date} date to Date
+ */
+export function getUTCDate(date) {
+	console.log('getUTCDate', new Date(new Date(date).setUTCDate(1)), new Date(getDateObject(date).setUTCDate(1)));
+	return new Date(new Date(date).setUTCDate(1))
+}
+
+/**
  * @name getDateObject
  * @exports
  * @description Get french date Object

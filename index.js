@@ -1,7 +1,7 @@
 import config from './config.json' assert { type: 'json' };
 import data from './data/databaseData.js';
 import accounts from './data/accounts.js';
-import { getDate, getDateObject } from './functions/dateHandler.js';
+import { getDate, getDateObject, getUTCDate } from './functions/dateHandler.js';
 import work from './functions/work.js';
 import pay from './functions/pay.js';
 import mainAccount from './data/mainAccount.js';
@@ -28,7 +28,7 @@ try {
 	/* Work */
 	accounts.map( (account, id) => {
 		const account_data = data[id];
-		console.log(getDate(account_data.date), getDateObject(account_data.date));
+		console.log(getDate(account_data.date), getDateObject(account_data.date), getUTCDate(account_data.date));
 		//if (account.id === mainAccount.id) {
 		const wait_time = 60 - getDateObject() - (account_data.date / config.one_minute);
 		
