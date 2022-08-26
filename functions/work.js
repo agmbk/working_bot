@@ -34,7 +34,7 @@ export default async function work(account, data, timeout) {
 	}
 	
 	/* Work less at night */
-	const currentHours = getDateObject().getHours();
+	/*const currentHours = getDateObject().getHours();
 	if (config.night.includes( currentHours )) {
 		console.log( `It's the night` );
 		
@@ -49,7 +49,7 @@ export default async function work(account, data, timeout) {
 			return work( account, data, timeout );
 		}
 	}
-	
+	*/
 	try {
 		await fetch( 'https://discord.com/api/v9/interactions', {
 			'headers': {

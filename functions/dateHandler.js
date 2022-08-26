@@ -10,7 +10,7 @@ export function getDate(date) {
 	if (arguments.length > 1) {
 		throw new Error( 'Too many arguments' );
 		
-	} else if (arguments.length === 1 && arguments[0].length) {
+	} else if (arguments.length === 1 && arguments[0]) {
 		result = new Date( date ).toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} );
 		
 	} else {
@@ -29,7 +29,7 @@ export function getDate(date) {
  * @name getDateObject
  * @exports
  * @description Get french date Object
- * @param {Date || string} date
+ * @param {Date || string || number} date
  * @returns {Date} date to Date
  */
 export function getDateObject(date = '') {
@@ -45,7 +45,8 @@ export function getDateObject(date = '') {
  * @returns {boolean}
  */
 export function isCurrentDay(date) {
-	let compared_date = getDateObject( date ), current_date = getDateObject();
+	const compared_date = getDateObject( date );
+	const current_date = getDateObject();
 	console.log( 'isCurrentDay'.red(), 'date', date, '1', compared_date, '2', current_date, compared_date.getDate(), current_date.getDate(), compared_date.getMonth(), current_date.getMonth(), compared_date.getFullYear(), current_date.getFullYear() );
 	return !(
 		compared_date.getDate() === current_date.getDate() &&
