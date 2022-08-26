@@ -22,7 +22,7 @@ function resFormat(res) {
 export default async function work(account, data, timeout) {
 	
 	timeout += config.cant_c_me * Math.random();
-	console.log( account.id, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', getDateObject().setMilliseconds( getDateObject().getMilliseconds() + timeout ) );
+	console.log( account.id, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', getDate(getDateObject().setMilliseconds( getDateObject().getMilliseconds() + timeout )) );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
 	/* Work less at night */
