@@ -20,7 +20,7 @@ query = `
         count integer NOT NULL,
         count_mean integer NOT NULL,
         error integer NOT NULL,
-        date timestamp without time zone NOT NULL,
+        date timestamp with time zone NOT NULL,
         CONSTRAINT ouranos_working_bot_pkey PRIMARY KEY(id)
         )`;
 
