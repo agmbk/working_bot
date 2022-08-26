@@ -64,8 +64,9 @@ export default async function pay(payer, receiver) {
 					const money = parseInt( message.content.split( '**' )[1] );
 					if (minutes < config.pay_interval / one_minute) {
 						console.warn( `${payer.id.green()} | Money laundered ${minutes} mins ago (${money.toString().green()})` );
+						setTimeout( () => pay( payer, receiver ), config.pay_interval + config.cant_c_me * Math.random() );
 					}
-					setTimeout( () => pay( payer, receiver ), config.pay_interval + config.cant_c_me * Math.random() );
+					
 					return;
 				}
 			}
