@@ -28,7 +28,7 @@ try {
 	/* Work */
 	accounts.map( (account, id) => {
 		const account_data = data[id];
-		console.log(getDate(account_data.date), getDateObject(account_data.date), getUTCDate(account_data.date));
+		console.log(account_data.date, getDate(account_data.date), getDateObject(account_data.date), getUTCDate(account_data.date));
 		//if (account.id === mainAccount.id) {
 		const wait_time = 60 - getDateObject() - (account_data.date / config.one_minute);
 		
