@@ -3,10 +3,7 @@ import config from '../config.json' assert { type: 'json' };
 import { getDate, getDateObject, isCurrentDay } from './dateHandler.js';
 import mainAccount from '../data/mainAccount.js';
 import saveData from './saveData.js';
-
-function resFormat(res) {
-	return `OK: ${res.ok ? res.ok.toString().green() : res.ok.toString().red()} | Status: ${res.status === 204 ? `${res.status} ${res.statusText}`.green() : `${res.status} ${res.statusText}`.red()}`;
-}
+import fetchResFormat from './fetchResFormat.js';
 
 /**
  * @name work
@@ -133,7 +130,7 @@ export default async function work(account, data, timeout) {
 				return work( account, data, timeout );
 				
 			} else {
-				console.warn( `${account.id.red()} failed ( ${resFormat( res )} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data.error} | Date: ${getDate()} )` );
+				console.warn( `${account.id.red()} failed ( ${fetchResFormat( res )} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data.error} | Date: ${getDate()} )` );
 				data.error += 1;
 				
 				const timeout = config.retry + config.cooldown * Math.random();

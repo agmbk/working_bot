@@ -1,6 +1,7 @@
 import config from '../config.json' assert { type: 'json' };
 import { getDate, getDateObject } from './dateHandler.js';
 import fetch from 'node-fetch';
+import fetchResFormat from './fetchResFormat.js';
 
 /**
  * @name pay
@@ -114,7 +115,7 @@ export default async function pay(payer, receiver) {
 			}
 		}
 		/* Probably invalid account */
-		console.error( `${payer.id.red()} fetching money failed | ${resFormat( res )} | Date: ${getDate()}` );
+		console.error( `${payer.id.red()} fetching money failed | ${fetchResFormat( res )} | Date: ${getDate()}` );
 		setTimeout( () => pay( payer, receiver ), config.retry + config.cant_c_me * Math.random() );
 		
 	} catch (e) {
