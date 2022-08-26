@@ -3,10 +3,9 @@ import data from './data/databaseData.js';
 import accounts from './data/accounts.js';
 import { getDate } from './functions/dateHandler.js';
 import work from './functions/work.js';
-// import pay from './functions/pay.js';
-import './data/color.js';
 import pay from './functions/pay.js';
 import mainAccount from './data/mainAccount.js';
+import './data/color.js';
 
 
 try {
@@ -22,7 +21,7 @@ try {
 	accounts.map( account => {
 		if (account.pay) {
 			console.log( `${account.id.cyan()} is paying ${mainAccount.id.cyan()}` );
-			setTimeout( () => pay( account, mainAccount ), one_hour );
+			setTimeout( () => pay( account, mainAccount ), config.one_hour );
 		}
 	} );
 	
