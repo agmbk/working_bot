@@ -12,7 +12,7 @@ import { getLocaleDate } from './dateHandler.js';
  * @returns {void}
  */
 export default async function saveData(data, id, date) {
-	console.log( 'saveData'.red(), date, getLocaleDate( date ), getLocaleDate( date ) );
+	console.log( 'saveData'.red(), date, data.toUTCString(), getLocaleDate( date ) );
 	try {
 		const query = `
             UPDATE ${config.table}
@@ -24,7 +24,7 @@ export default async function saveData(data, id, date) {
                 count            = ${data.count},
                 count_mean       = ${data.count_mean},
                 error            = ${data.error},
-                date             = '${date}'
+                date             = '${date.toUTCString()}'
             WHERE id = '${id}'
 		`;
 		await database.query( query );

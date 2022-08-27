@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import config from '../config.json' assert { type: 'json' };
-import { getLocaleDate, isCurrentDay } from './dateHandler.js';
+import { getLocaleDate, getLocaleDateString, isCurrentDay } from './dateHandler.js';
 import mainAccount from '../data/mainAccount.js';
 import saveData from './saveData.js';
 import fetchResFormat from './fetchResFormat.js';
@@ -22,20 +22,19 @@ export default async function work(account, data, timeout) {
 	const activity = await getActivity( account );
 	timeout += config.cant_c_me * Math.random();
 	let working_at = getLocaleDate();
-	working_at.setMinutes( working_at.getMinutes() + (timeout / config.one_minute) );
-	console.log( account.id, 'activity'.cyan(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toJSON() );
+	working_at.setMilliseconds( working_at.getMilliseconds() + timeout );
+	console.log( account.id, 'activity'.cyan(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
-	
 	/* Activity count */
-	if (activity <= 2) {
+	if (activity <= 1) {
 		const timeout = config.one_hour / 6 + config.cooldown * Math.random();
-		console.log( account.id, 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toString() );
+		console.log( account.id, 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
 		return work( account, data, timeout );
 	}
 	
 	/* Secondary accounts work less */
 	if (account.id !== mainAccount.id) {
-		if (activity <= 9) {
+		if (activity <= 4) {
 			timeout = config.work_interval + config.cooldown * Math.random();
 			return work( account, data, timeout );
 		}
@@ -125,7 +124,7 @@ export default async function work(account, data, timeout) {
 					for (const message of json) {
 						if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
 							money_mess_date = getLocaleDate( message.timestamp );
-							console.log( `Money message ${money_mess_date} (${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDate()}), Last in DB ${data.date}` );
+							console.log( `Money message ${money_mess_date} (${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}), Last in DB ${data.date}` );
 							if (money_mess_date > data.date) return parseInt( message.content.split( '**' )[1] );
 						}
 					}
@@ -146,7 +145,7 @@ export default async function work(account, data, timeout) {
 				return work( account, data, timeout );
 				
 			} else {
-				console.warn( `${account.id.red()} failed ( ${fetchResFormat( res )} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data.error} | Date: ${getLocaleDate()} )` );
+				console.warn( `${account.id.red()} failed ( ${fetchResFormat( res )} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data.error} | Date: ${getLocaleDateString()} )` );
 				data.error += 1;
 				
 				const timeout = config.work_interval + config.retry + config.cooldown * Math.random();

@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import accounts from '../data/accounts.js';
 
 /**
  * @name getActivity
@@ -8,7 +9,11 @@ import fetch from 'node-fetch';
  * @return {Promise<number>} the message count of others since the last money message
  */
 export default async function getActivity(account) {
-	
+	const workers = (() => {
+		let workers = [];
+		accounts.forEach( worker => {if (worker.id !== account.id) workers.push( worker.id );} );
+		return workers;
+	})();
 	return await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {
 		'headers': {
 			'accept': '*/*',
@@ -31,7 +36,7 @@ export default async function getActivity(account) {
 		for (const message of json) {
 			if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
 				return activity;
-			} else {
+			} else if (!(workers.includes( message.interaction.user.id ) && message.author.id === '952125649345196044' && message.interaction.name === 'work')) {
 				activity++;
 			}
 		}

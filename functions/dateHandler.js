@@ -3,8 +3,8 @@ import config from '../config.json' assert { type: 'json' };
 /**
  * @name getLocaleDate
  * @exports
- * @description Get french date, //formatted in en-US for Postgres
- * @returns {Date} date to string
+ * @description Get french date
+ * @returns {Date} date to date
  */
 export function getLocaleDate(date) {
 	let result;
@@ -18,6 +18,16 @@ export function getLocaleDate(date) {
 		throw new Error( `Invalid date: ${date}` );
 	}
 	return result;
+}
+
+/**
+ * @name getLocaleDateString
+ * @exports
+ * @description Get french date to string
+ * @returns {string} date to string
+ */
+export function getLocaleDateString(date) {
+	return getLocaleDate( date ).toLocaleString( 'fr-EU' );
 }
 
 /**
