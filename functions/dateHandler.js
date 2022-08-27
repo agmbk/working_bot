@@ -42,6 +42,17 @@ export function getUTCDateToLocale(date) {
 }
 
 /**
+ * @name getMessageUTCDate
+ * @exports
+ * @description Get discord message date, to UTC Date
+ * @returns {Date} date to Date
+ */
+export function getMessageUTCDate(date) {
+	date = new Date(getLocaleDate('Sun Aug 28 2022 00:45:39 GMT+0000'.split('GMT')[0]).toJSON()).toUTCString()
+	return date;
+}
+
+/**
  * @name isCurrentDay
  * @exports
  * @description Check if a date is the same day as the current date
