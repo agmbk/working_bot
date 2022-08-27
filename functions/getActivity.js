@@ -1,6 +1,8 @@
 import fetch from 'node-fetch';
 
 /**
+ * @name getActivity
+ * @description activity of the channel from 0 to 10, 0 is inactive, 10 is very active
  *
  * @param account the account
  * @return {Promise<number>} the message count of others since the last money message
@@ -32,7 +34,6 @@ export default async function getActivity(account) {
 			} else {
 				activity++;
 			}
-			
 		}
 		return activity;
 	} ) );

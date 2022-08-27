@@ -24,7 +24,7 @@ export default async function saveData(data, id, date) {
                 count            = ${data.count},
                 count_mean       = ${data.count_mean},
                 error            = ${data.error},
-                date             = '${getUTCDateString( date )}'
+                date             = '${date}'
             WHERE id = '${id}'
 		`;
 		await database.query( query );
