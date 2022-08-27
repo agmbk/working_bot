@@ -109,7 +109,6 @@ export default async function work(account, data, timeout) {
 				
 				/** Fetch money gain */
 				await new Promise( resolve => setTimeout( resolve, config.one_second * 5 ) );
-				let activity = 10;
 				money = await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {
 					'headers': {
 						'accept': '*/*',

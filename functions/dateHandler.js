@@ -7,17 +7,17 @@ import config from '../config.json' assert { type: 'json' };
  * @returns {Date} date to date
  */
 export function getLocaleDate(date) {
-	let result;
+	let result_date;
 	if (arguments.length === 1 && arguments[0]) {
-		result = new Date( date ).toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} );
+		result_date = new Date( date );
 	} else {
-		result = new Date().toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} );
+		result_date = new Date();
 	}
-	result = new Date( result );
-	if (!(result instanceof Date)) {
-		throw new Error( `Invalid date: ${date}` );
+	result_date = new Date( result_date.toLocaleString( 'en-US', {timeZone: 'Europe/Paris'} ) );
+	if (!(result_date instanceof Date)) {
+		throw new Error( `Invalid date: ${date}`.red() );
 	}
-	return result;
+	return result_date;
 }
 
 /**

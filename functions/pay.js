@@ -2,6 +2,7 @@ import config from '../config.json' assert { type: 'json' };
 import { getLocaleDate } from './dateHandler.js';
 import fetchResFormat from './fetchResFormat.js';
 import fetch from 'node-fetch';
+import getActivity from './getActivity.js';
 
 /**
  * @name pay
@@ -13,9 +14,12 @@ import fetch from 'node-fetch';
  */
 export default async function pay(payer, receiver) {
 	
-	if (config.night.includes( getLocaleDate().getHours() )) {
-		setTimeout( () => pay( payer, receiver ), config.pay_interval + config.cant_c_me * Math.random() );
+	const activity = await getActivity( payer );
+	const timeout = config.one_hour * 2 + config.cant_c_me * Math.random()
+	if (activity < 10) {
+		setTimeout( () => pay( payer, receiver ), timeout );
 	}
+	
 	try {
 		const res = await fetch( 'https://discord.com/api/v9/interactions', {
 			'headers': {
