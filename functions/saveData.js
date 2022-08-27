@@ -1,6 +1,6 @@
 import config from '../config.json' assert { type: 'json' };
 import database from '../data/database.js';
-import { getDateObject, getUTCDateString } from './dateHandler.js';
+import { getDate, getDateObject, getUTCDateString } from './dateHandler.js';
 
 /**
  * @name saveData
@@ -12,7 +12,7 @@ import { getDateObject, getUTCDateString } from './dateHandler.js';
  * @returns {void}
  */
 export default async function saveData(data, id, date) {
-	console.log('saveData'.red(), date, getUTCDateString( date ),  getUTCDateString( getDateObject(date) ));
+	console.log('saveData'.red(), date, getUTCDateString( date ),  getUTCDateString( getDateObject(date) ), getDate(date), getDateObject(date));
 	try {
 		const query = `
             UPDATE ${config.table}

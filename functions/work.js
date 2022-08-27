@@ -26,7 +26,7 @@ export default async function work(account, data, timeout) {
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
 	/* Activity count */
-	if (activity < 2) {
+	if (activity > 0) {
 		const timeout = config.work_interval + config.cooldown * Math.random();
 		console.log( account.id, 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toString());
 		await new Promise( resolve => setTimeout( resolve, timeout ) );
@@ -35,12 +35,14 @@ export default async function work(account, data, timeout) {
 	
 	/* Secondary accounts work less */
 	if (account.id !== mainAccount.id) {
-		timeout = config.work_interval + config.cooldown * Math.random();
-		if (Math.random() > 0.1) return work( account, data, timeout );
+		if (activity <= 9) {
+			timeout = config.work_interval + config.cooldown * Math.random();
+			return work( account, data, timeout );
+		}
 		
 	}
 	
-	/* Work less at night */
+	/* Work less at night
 	const currentHours = getDateObject().getHours();
 	if (config.night.includes( currentHours )) {
 		console.log( `It's the night` );
@@ -56,6 +58,7 @@ export default async function work(account, data, timeout) {
 			return work( account, data, timeout );
 		}
 	}
+	*/
 	
 	try {
 		await fetch( 'https://discord.com/api/v9/interactions', {

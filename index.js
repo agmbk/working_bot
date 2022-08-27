@@ -32,7 +32,7 @@ try {
 		console.log( account_data.date, getDate( account_data.date ), getDateObject( account_data.date ), getUTCDate( account_data.date ) );
 		//if (account.id === mainAccount.id) {
 		const wait_time = 60 - getDateObject() - (account_data.date / config.one_minute);
-		getActivity(account).then(activity => console.log('activity'.red(), activity ));
+		// getActivity(account).then(activity => console.log('activity'.red(), activity ));
 		
 		if (wait_time > 0) {
 			const timeout = wait_time * config.one_minute + config.cooldown * Math.random();

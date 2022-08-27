@@ -1,5 +1,10 @@
 import fetch from 'node-fetch';
 
+/**
+ *
+ * @param account the account
+ * @return {Promise<number>} the message count of others since the last money message
+ */
 export default async function getActivity(account) {
 	
 	return await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {
@@ -19,17 +24,16 @@ export default async function getActivity(account) {
 		'method': 'GET',
 		'mode': 'cors',
 	} ).then( res => res.json().then( json => {
-		
-		/* Get the count of money messages remaining after 1 hour */
 		let activity = 0;
+		
 		for (const message of json) {
-			if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id /* && message.interaction.name === 'work' */) {
-				continue;
+			if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
+				return activity;
 			} else {
 				activity++;
 			}
+			
 		}
 		return activity;
-		
 	} ) );
 }
