@@ -11,7 +11,7 @@ import './data/color.js';
 try {
 	/** DB data */
 	
-	console.log( '*** Database data ***'.blue(), data, new Date(getLocaleDate('Sun Aug 28 2022 00:45:39 GMT+0000'.split('GMT')[0]).toJSON()).toUTCString(), getLocaleDate(getLocaleDate('Sun Aug 28 2022 00:45:39 GMT+0000'.split('GMT')[0]).toJSON()).toUTCString());
+	console.log( '*** Database data ***'.blue(), data, new Date(new Date('Sun Aug 28 2022 00:45:39 GMT+0000'.split('GMT')[0]).toJSON()).toUTCString(), getLocaleDate(new Date('Sun Aug 28 2022 00:45:39 GMT+0000'.split('GMT')[0]).toJSON()).toUTCString());
 	
 	/** Workers */
 	
