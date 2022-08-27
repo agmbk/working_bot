@@ -118,7 +118,7 @@ export default async function pay(payer, receiver) {
 					} else {
 						console.warn( `${payer.id.red()} | Money laundering failed, retry in ${config.retry / config.one_minute} mins` );
 					}
-					setTimeout( () => pay( payer, receiver ), config.pay_interval + config.cant_c_me * Math.random() );
+					return setTimeout( () => pay( payer, receiver ), config.pay_interval + config.cant_c_me * Math.random() );
 				} );
 			}
 		}
