@@ -26,7 +26,7 @@ export default async function work(account, data, timeout) {
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
 	/* Activity count */
-	if (activity > 0) {
+	if (activity < 5) {
 		const timeout = config.work_interval + config.cooldown * Math.random();
 		console.log( account.id, 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toString());
 		await new Promise( resolve => setTimeout( resolve, timeout ) );

@@ -2,6 +2,7 @@ import config from '../config.json' assert { type: 'json' };
 import database from './database.js';
 import accounts from './accounts.js';
 import fs from 'fs';
+import { getDateObject } from '../functions/dateHandler.js';
 
 
 await database.connect();
@@ -73,7 +74,7 @@ const data = await Promise.all( accounts.map( async (account, id) => {
                  WHERE id = '${account.id}'`;
 		res = await database.query( query );
 	}
-	
+	res[0].date = getDateObject( res[0].date )
 	return res.rows[0];
 } ) );
 
