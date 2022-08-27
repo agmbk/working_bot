@@ -7,7 +7,7 @@
   "one_second": 1e3,
   "pay_interval": 3e8,
   "work_interval": 3.6e6,
-  "cant_c_me": 0,
+  "cant_c_me": 1e6,
   "retry": 300000,
   "night": [
     1,

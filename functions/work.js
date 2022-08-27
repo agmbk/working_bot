@@ -18,23 +18,23 @@ import fetchResFormat from './fetchResFormat.js';
  */
 export default async function work(account, data, timeout) {
 	
+	timeout += config.cant_c_me * Math.random();
+	console.log( account.id, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', getDate( getDateObject().setMilliseconds( getDateObject().getMilliseconds() + timeout ) ) );
+	await new Promise( resolve => setTimeout( resolve, timeout ) );
+	
 	/* Secondary accounts work less */
 	if (account.id !== mainAccount.id) {
-		timeout += config.cant_c_me * Math.random();
-		console.log( account.id, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', getDate( getDateObject().setMilliseconds( getDateObject().getMilliseconds() + timeout ) ) );
-		
-		await new Promise( resolve => setTimeout( resolve, timeout ) );
 		timeout = config.work_interval + config.cooldown * Math.random();
-		if (Math.random() > 0.2) return work( account, data, timeout );
+		if (Math.random() > 0.1) return work( account, data, timeout );
 		
 	} else {
-		timeout += config.cant_c_me * Math.random() / 2;
 		console.log( account.id, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', getDate( getDateObject().setMilliseconds( getDateObject().getMilliseconds() + timeout ) ) );
 		await new Promise( resolve => setTimeout( resolve, timeout ) );
+	
 	}
 	
 	/* Work less at night */
-	/*const currentHours = getDateObject().getHours();
+	const currentHours = getDateObject().getHours();
 	if (config.night.includes( currentHours )) {
 		console.log( `It's the night` );
 		
@@ -44,12 +44,12 @@ export default async function work(account, data, timeout) {
 			// timeout = Date.parse(getDate())  + config.cooldown * Math.random();
 			timeout = config.work_interval + config.cooldown * Math.random();
 			return work( account, data, timeout );
-		} else if (Math.random() > 0.2) {
+		} else if (Math.random() > 0.1) {
 			const timeout = config.work_interval + config.cooldown * Math.random();
 			return work( account, data, timeout );
 		}
 	}
-	*/
+	
 	try {
 		await fetch( 'https://discord.com/api/v9/interactions', {
 			'headers': {
@@ -138,7 +138,7 @@ export default async function work(account, data, timeout) {
 				console.warn( `${account.id.red()} failed ( ${fetchResFormat( res )} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data.error} | Date: ${getDateObject()} )` );
 				data.error += 1;
 				
-				const timeout = config.retry + config.cooldown * Math.random();
+				const timeout = config.work_interval + config.retry + config.cooldown * Math.random();
 				return work( account, data, timeout );
 			}
 		} );
