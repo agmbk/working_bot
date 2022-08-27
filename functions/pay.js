@@ -1,7 +1,7 @@
 import config from '../config.json' assert { type: 'json' };
 import { getLocaleDate } from './dateHandler.js';
-import fetch from 'node-fetch';
 import fetchResFormat from './fetchResFormat.js';
+import fetch from 'node-fetch';
 
 /**
  * @name pay
@@ -60,7 +60,7 @@ export default async function pay(payer, receiver) {
 				return res.json();
 			} );
 			
-			/* Try to get the last payement */
+			/** Try to get the last payement */
 			for (const message of messages) {
 				if (message.author.id === '952125649345196044' && message.interaction.user.id === payer.id && message.interaction.name === 'pay') {
 					const minutes = ((Date.parse( getLocaleDate() ) - Date.parse( message.timestamp )) / config.one_minute).toFixed( 0 );
@@ -74,7 +74,7 @@ export default async function pay(payer, receiver) {
 				}
 			}
 			
-			/* Get money amount from messages */
+			/** Get money amount from messages */
 			let money;
 			for (const message of messages) {
 				if (message.author.id === '952125649345196044' && message.interaction.user.id === payer.id && message.interaction.name === 'money') {
@@ -118,7 +118,7 @@ export default async function pay(payer, receiver) {
 				} );
 			}
 		}
-		/* Probably invalid account or banned */
+		/** Probably invalid account or banned */
 		console.error( `${payer.id.red()} fetching money failed (account banned ?) | ${fetchResFormat( res )} | Date: ${getLocaleDate()}` );
 		setTimeout( () => pay( payer, receiver ), config.retry + config.cant_c_me * Math.random() );
 		
@@ -126,4 +126,4 @@ export default async function pay(payer, receiver) {
 		console.error( 'Pay has crashed'.red(), e );
 		setTimeout( () => pay( payer, receiver ), config.retry + config.cant_c_me * Math.random() );
 	}
-} /* eof pay */
+}

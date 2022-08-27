@@ -1,12 +1,11 @@
 import config from './config.json' assert { type: 'json' };
 import data from './data/databaseData.js';
 import accounts from './data/accounts.js';
+import mainAccount from './data/mainAccount.js';
 import { getLocaleDate, getLocaleDateString } from './functions/dateHandler.js';
 import work from './functions/work.js';
 import pay from './functions/pay.js';
-import mainAccount from './data/mainAccount.js';
 import './data/color.js';
-import getActivity from './functions/getActivity.js';
 
 
 try {
@@ -18,7 +17,7 @@ try {
 	
 	console.log( '*** Workers start-up ***'.blue() );
 	
-	/* Pay */
+	/** Pay */
 	accounts.map( account => {
 		if (account.pay) {
 			console.log( `${account.id.cyan()} is paying ${mainAccount.id.cyan()}` );
@@ -26,11 +25,9 @@ try {
 		}
 	} );
 	
-	/* Work */
+	/** Work */
 	accounts.map( (account, id) => {
 		const account_data = data[id];
-		console.log( getActivity( account ) );
-		console.log( 'account_data.date'.red(), account_data.date );
 		const wait_time = 60 - getLocaleDate() - (account_data.date / config.one_minute);
 		
 		if (wait_time > 0) {

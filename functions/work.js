@@ -1,7 +1,7 @@
-import fetch from 'node-fetch';
 import config from '../config.json' assert { type: 'json' };
-import { getLocaleDate, getLocaleDateString, isCurrentDay } from './dateHandler.js';
+import fetch from 'node-fetch';
 import mainAccount from '../data/mainAccount.js';
+import { getLocaleDate, getLocaleDateString, isCurrentDay } from './dateHandler.js';
 import saveData from './saveData.js';
 import fetchResFormat from './fetchResFormat.js';
 import getActivity from './getActivity.js';
@@ -26,7 +26,7 @@ export default async function work(account, data, timeout) {
 	console.log( account.id, 'activity'.cyan(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
-	/* Activity count */
+	/** Activity count */
 	if (account.id === mainAccount.id) {
 		if (activity < 1) {
 			if (Math.random() < 0.9) {
@@ -40,7 +40,7 @@ export default async function work(account, data, timeout) {
 				work( account, data, timeout );
 			}
 		}
-	} else { /* Secondary accounts work less */
+	} else { /** Secondary accounts work less */
 		if (activity <= 4) {
 			timeout = config.work_interval + config.cooldown * Math.random();
 			return work( account, data, timeout );
@@ -89,7 +89,7 @@ export default async function work(account, data, timeout) {
 			'mode': 'cors',
 		} ).then( async res => {
 			
-			/* Calculate mean of the day */
+			/** Calculate mean of the day */
 			if (isCurrentDay( data.date )) {
 				console.log( 'new day'.red() );
 				data.total_days_count += 1;
@@ -104,9 +104,7 @@ export default async function work(account, data, timeout) {
 				data.count += 1;
 				data.count_total += 1;
 				
-				/**
-				 * Fetch money gain
-				 */
+				/** Fetch money gain */
 				await new Promise( resolve => setTimeout( resolve, config.one_second * 5 ) );
 				let activity = 10;
 				money = await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {
@@ -127,7 +125,7 @@ export default async function work(account, data, timeout) {
 					'mode': 'cors',
 				} ).then( res => res.json().then( json => {
 					
-					/* Get the last message > timestamp - cooldown */
+					/** Get the last message > DB date */
 					for (const message of json) {
 						if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
 							money_mess_date = getLocaleDate( message.timestamp );
@@ -167,4 +165,4 @@ export default async function work(account, data, timeout) {
 		return work( account, data, timeout );
 	}
 	
-} /* eof work */
+}
