@@ -19,16 +19,16 @@ import getActivity from './getActivity.js';
  */
 export default async function work(account, data, timeout) {
 	
-	const activity = await getActivity(account);
+	const activity = await getActivity( account );
 	timeout += config.cant_c_me * Math.random();
-	const working_at = getDateObject().setMinutes( getDateObject().getMinutes() + (timeout / config.one_minute) )
-	console.log( account.id, 'activity'.cyan(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toString());
+	const working_at = getDateObject().setMinutes( getDateObject().getMinutes() + (timeout / config.one_minute) );
+	console.log( account.id, 'activity'.cyan(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toString() );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
 	/* Activity count */
-	if (activity < 2) {
+	if (activity <= 2) {
 		const timeout = config.work_interval + config.cooldown * Math.random();
-		console.log( account.id, 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toString());
+		console.log( account.id, 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toString() );
 		await new Promise( resolve => setTimeout( resolve, timeout ) );
 		return work( account, data, timeout );
 	}
@@ -43,22 +43,22 @@ export default async function work(account, data, timeout) {
 	}
 	
 	/* Work less at night
-	const currentHours = getDateObject().getHours();
-	if (config.night.includes( currentHours )) {
-		console.log( `It's the night` );
-		
-		if (account.id !== mainAccount.id) {
-			// let date = new Date(Date.parse(getDate()))
-			// date.setHours(date.getHours() + (config.night.at(-1) - currentHours))
-			// timeout = Date.parse(getDate())  + config.cooldown * Math.random();
-			timeout = config.work_interval + config.cooldown * Math.random();
-			return work( account, data, timeout );
-		} else if (Math.random() > 0.1) {
-			const timeout = config.work_interval + config.cooldown * Math.random();
-			return work( account, data, timeout );
-		}
-	}
-	*/
+	 const currentHours = getDateObject().getHours();
+	 if (config.night.includes( currentHours )) {
+	 console.log( `It's the night` );
+	 
+	 if (account.id !== mainAccount.id) {
+	 // let date = new Date(Date.parse(getDate()))
+	 // date.setHours(date.getHours() + (config.night.at(-1) - currentHours))
+	 // timeout = Date.parse(getDate())  + config.cooldown * Math.random();
+	 timeout = config.work_interval + config.cooldown * Math.random();
+	 return work( account, data, timeout );
+	 } else if (Math.random() > 0.1) {
+	 const timeout = config.work_interval + config.cooldown * Math.random();
+	 return work( account, data, timeout );
+	 }
+	 }
+	 */
 	
 	try {
 		await fetch( 'https://discord.com/api/v9/interactions', {

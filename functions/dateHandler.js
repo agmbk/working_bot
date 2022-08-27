@@ -32,7 +32,7 @@ export function getDate(date) {
  * @returns {string} date to string
  */
 export function getUTCDateString(date) {
-	return getUTCDate(date).toUTCString();
+	return getUTCDate( date ).toUTCString();
 }
 
 /**

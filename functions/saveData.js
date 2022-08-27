@@ -12,7 +12,7 @@ import { getDate, getDateObject, getUTCDateString } from './dateHandler.js';
  * @returns {void}
  */
 export default async function saveData(data, id, date) {
-	console.log('saveData'.red(), date, getUTCDateString( date ),  getUTCDateString( getDateObject(date) ), getDate(date), getDateObject(date));
+	console.log( 'saveData'.red(), date, getUTCDateString( date ), getUTCDateString( getDateObject( date ) ), getDate( date ), getDateObject( date ) );
 	try {
 		const query = `
             UPDATE ${config.table}
