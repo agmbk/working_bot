@@ -4,6 +4,7 @@ import { getDate, getDateObject, isCurrentDay } from './dateHandler.js';
 import mainAccount from '../data/mainAccount.js';
 import saveData from './saveData.js';
 import fetchResFormat from './fetchResFormat.js';
+import getActivity from './getActivity.js';
 
 /**
  * @name work
@@ -18,19 +19,25 @@ import fetchResFormat from './fetchResFormat.js';
  */
 export default async function work(account, data, timeout) {
 	
+	const activity = await getActivity(account);
 	timeout += config.cant_c_me * Math.random();
-	console.log( account.id, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', getDate( getDateObject().setMilliseconds( getDateObject().getMilliseconds() + timeout ) ) );
+	const working_at = getDateObject().setMinutes( getDateObject().getMinutes() + (timeout / config.one_minute) )
+	console.log( account.id, 'activity'.cyan(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toString());
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
+	
+	/* Activity count */
+	if (activity < 2) {
+		const timeout = config.work_interval + config.cooldown * Math.random();
+		console.log( account.id, 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toString());
+		await new Promise( resolve => setTimeout( resolve, timeout ) );
+		return work( account, data, timeout );
+	}
 	
 	/* Secondary accounts work less */
 	if (account.id !== mainAccount.id) {
 		timeout = config.work_interval + config.cooldown * Math.random();
 		if (Math.random() > 0.1) return work( account, data, timeout );
 		
-	} else {
-		console.log( account.id, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', getDate( getDateObject().setMilliseconds( getDateObject().getMilliseconds() + timeout ) ) );
-		await new Promise( resolve => setTimeout( resolve, timeout ) );
-	
 	}
 	
 	/* Work less at night */
@@ -92,7 +99,8 @@ export default async function work(account, data, timeout) {
 				 * Fetch money gain
 				 */
 				await new Promise( resolve => setTimeout( resolve, config.one_second * 5 ) );
-				money = await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=30`, {
+				let activity = 10;
+				money = await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {
 					'headers': {
 						'accept': '*/*',
 						'accept-language': 'fr,fr-FR;q=0.9',
@@ -128,7 +136,7 @@ export default async function work(account, data, timeout) {
 				data.money_total += money;
 				data.money += money;
 				
-				console.log( `${account.id.green()} | Money: ${data.money.toString().blue()} | Mean: ${data.money_mean} | Gain: ${money.toString().green()} | Count: ${data.count} | Date: ${getDateObject()}` );
+				console.log( `${account.id.green()} | Money: ${data.money.toString().blue()} | Mean: ${data.money_mean} | Gain: ${money.toString().green()} | Count: ${data.count} | Date: ${money_mess_date}` );
 				
 				const timeout = config.work_interval + config.cooldown * Math.random();
 				await saveData( data, account.id, money_mess_date );
