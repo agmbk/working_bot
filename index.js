@@ -11,7 +11,7 @@ import './data/color.js';
 try {
 	/** DB data */
 	
-	console.log( '*** Database data ***'.blue(), data, new Date('Sun Aug 28 2022 00:45:39 GMT+0000'.replace('GMT+0000', 'GMT+0200')[0]).toUTCString());
+	console.log( '*** Database data ***'.blue(), data, new Date('Sun Aug 28 2022 00:45:39 GMT+0000'.replace('GMT+0000', 'GMT+0200')).toUTCString());
 	
 	/** Workers */
 	
