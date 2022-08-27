@@ -35,12 +35,12 @@ try {
 		
 		if (wait_time > 0) {
 			const timeout = wait_time * config.one_minute + config.cooldown * Math.random();
-			console.log( `${account.id.cyan()} will works in ${wait_time.toFixed( 0 ).cyan()} mins | Date: ${getLocaleDate()}` );
+			console.log( `${account.id.cyan()} will works in ${wait_time.toFixed( 0 ).cyan()} mins | Date: ${getLocaleDate().toLocaleString()}` );
 			
 			work( account, account_data, timeout );
 			
 		} else {
-			console.log( `${account.id.cyan()} will works now | Date: ${getLocaleDate()}` );
+			console.log( `${account.id.cyan()} will works now | Date: ${getLocaleDate().toLocaleString()}` );
 			work( account, account_data, 0 );
 		}
 		//}
