@@ -26,10 +26,17 @@ export default async function work(account, data, timeout) {
 	console.log( account.id, 'activity'.cyan(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	/* Activity count */
-	if (activity <= 1) {
-		const timeout = config.one_hour / 6 + config.cooldown * Math.random();
-		console.log( account.id, 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
-		return work( account, data, timeout );
+	if (activity < 1) {
+		if (Math.random() < 0.9) {
+			const timeout = config.one_hour / 6 + config.cooldown * Math.random();
+			console.log( account.id, 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
+			return work( account, data, timeout );
+		}
+	} else {
+		if (Math.random() < 0.2) {
+			const timeout = config.cant_c_me * Math.random();
+			work( account, data, timeout );
+		}
 	}
 	
 	/* Secondary accounts work less */
