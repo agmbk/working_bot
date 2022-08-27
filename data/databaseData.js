@@ -74,7 +74,8 @@ const data = await Promise.all( accounts.map( async (account, id) => {
                  WHERE id = '${account.id}'`;
 		res = await database.query( query );
 	}
-	res[0].date = getDateObject( res[0].date )
+	
+	res.rows[0].date = getDateObject( res.rows[0].date )
 	return res.rows[0];
 } ) );
 
