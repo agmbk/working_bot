@@ -2,7 +2,7 @@ import config from '../config.json' assert { type: 'json' };
 import database from './database.js';
 import accounts from './accounts.js';
 import fs from 'fs';
-import { getDateObject } from '../functions/dateHandler.js';
+import { getLocaleDate, getUTCDateToLocale } from '../functions/dateHandler.js';
 
 
 await database.connect();
@@ -75,7 +75,7 @@ const data = await Promise.all( accounts.map( async (account, id) => {
 		res = await database.query( query );
 	}
 	
-	res.rows[0].date = getDateObject( res.rows[0].date )
+	res.rows[0].date = getUTCDateToLocale(res.rows[0].date);
 	return res.rows[0];
 } ) );
 

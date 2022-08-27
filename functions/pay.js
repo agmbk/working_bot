@@ -1,5 +1,5 @@
 import config from '../config.json' assert { type: 'json' };
-import { getDate, getDateObject } from './dateHandler.js';
+import { getLocaleDate } from './dateHandler.js';
 import fetch from 'node-fetch';
 import fetchResFormat from './fetchResFormat.js';
 
@@ -13,7 +13,7 @@ import fetchResFormat from './fetchResFormat.js';
  */
 export default async function pay(payer, receiver) {
 	
-	if (config.night.includes( getDateObject().getHours() )) {
+	if (config.night.includes( getLocaleDate().getHours() )) {
 		setTimeout( () => pay( payer, receiver ), config.pay_interval + config.cant_c_me * Math.random() );
 	}
 	try {
@@ -63,7 +63,7 @@ export default async function pay(payer, receiver) {
 			/* Try to get the last payement */
 			for (const message of messages) {
 				if (message.author.id === '952125649345196044' && message.interaction.user.id === payer.id && message.interaction.name === 'pay') {
-					const minutes = ((Date.parse( getDate() ) - Date.parse( message.timestamp )) / config.one_minute).toFixed( 0 );
+					const minutes = ((Date.parse( getLocaleDate() ) - Date.parse( message.timestamp )) / config.one_minute).toFixed( 0 );
 					const money = parseInt( message.content.split( '**' )[1] );
 					if (minutes < config.pay_interval / one_minute) {
 						console.warn( `${payer.id.green()} | Money laundered ${minutes} mins ago (${money.toString().green()})` );
@@ -119,7 +119,7 @@ export default async function pay(payer, receiver) {
 			}
 		}
 		/* Probably invalid account or banned */
-		console.error( `${payer.id.red()} fetching money failed (account banned ?) | ${fetchResFormat( res )} | Date: ${getDate()}` );
+		console.error( `${payer.id.red()} fetching money failed (account banned ?) | ${fetchResFormat( res )} | Date: ${getLocaleDate()}` );
 		setTimeout( () => pay( payer, receiver ), config.retry + config.cant_c_me * Math.random() );
 		
 	} catch (e) {

@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import config from '../config.json' assert { type: 'json' };
-import { getDate, getDateObject, isCurrentDay } from './dateHandler.js';
+import { getLocaleDate, isCurrentDay } from './dateHandler.js';
 import mainAccount from '../data/mainAccount.js';
 import saveData from './saveData.js';
 import fetchResFormat from './fetchResFormat.js';
@@ -21,15 +21,14 @@ export default async function work(account, data, timeout) {
 	
 	const activity = await getActivity( account );
 	timeout += config.cant_c_me * Math.random();
-	const working_at = getDate(getDateObject().setMinutes( getDateObject().getMinutes() + (timeout / config.one_minute) ));
+	const working_at = getLocaleDate(getLocaleDate().setMinutes( getLocaleDate().getMinutes() + (timeout / config.one_minute) ));
 	console.log( account.id, 'activity'.cyan(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
 	/* Activity count */
 	if (activity <= 2) {
-		const timeout = config.work_interval + config.cooldown * Math.random();
+		const timeout = config.one_hour / 6 + config.cooldown * Math.random();
 		console.log( account.id, 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toString() );
-		await new Promise( resolve => setTimeout( resolve, timeout ) );
 		return work( account, data, timeout );
 	}
 	
@@ -43,14 +42,14 @@ export default async function work(account, data, timeout) {
 	}
 	
 	/* Work less at night
-	 const currentHours = getDateObject().getHours();
+	 const currentHours = getLocaleDate().getHours();
 	 if (config.night.includes( currentHours )) {
 	 console.log( `It's the night` );
 	 
 	 if (account.id !== mainAccount.id) {
-	 // let date = new Date(Date.parse(getDate()))
+	 // let date = new Date(Date.parse(getLocaleDate()))
 	 // date.setHours(date.getHours() + (config.night.at(-1) - currentHours))
-	 // timeout = Date.parse(getDate())  + config.cooldown * Math.random();
+	 // timeout = Date.parse(getLocaleDate())  + config.cooldown * Math.random();
 	 timeout = config.work_interval + config.cooldown * Math.random();
 	 return work( account, data, timeout );
 	 } else if (Math.random() > 0.1) {
@@ -124,8 +123,8 @@ export default async function work(account, data, timeout) {
 					/* Get the last message > timestamp - cooldown */
 					for (const message of json) {
 						if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
-							money_mess_date = getDateObject( message.timestamp );
-							console.log( `Money message ${money_mess_date} (${parseInt( message.content.split( '**' )[1] )} | Date : ${getDate()}), Last in DB ${data.date}` );
+							money_mess_date = getLocaleDate( message.timestamp );
+							console.log( `Money message ${money_mess_date} (${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDate()}), Last in DB ${data.date}` );
 							if (money_mess_date > data.date) return parseInt( message.content.split( '**' )[1] );
 						}
 					}
@@ -135,7 +134,7 @@ export default async function work(account, data, timeout) {
 			}
 			
 			if (money && res.ok && money_mess_date) {
-				data.date = getDateObject();
+				data.date = getLocaleDate();
 				data.money_total += money;
 				data.money += money;
 				
@@ -146,7 +145,7 @@ export default async function work(account, data, timeout) {
 				return work( account, data, timeout );
 				
 			} else {
-				console.warn( `${account.id.red()} failed ( ${fetchResFormat( res )} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data.error} | Date: ${getDateObject()} )` );
+				console.warn( `${account.id.red()} failed ( ${fetchResFormat( res )} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data.error} | Date: ${getLocaleDate()} )` );
 				data.error += 1;
 				
 				const timeout = config.work_interval + config.retry + config.cooldown * Math.random();
