@@ -30,16 +30,17 @@ export default async function getActivity(account) {
 		'body': null,
 		'method': 'GET',
 		'mode': 'cors',
-	} ).then( res => res.json().then( json => {
+	} ).then( res => res.json().then( async json => {
 		let activity = 0;
 		
 		for (const message of json) {
 			if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
 				return activity;
-			} else if (!(workers.includes( message.interaction.user.id ) && message.author.id === '952125649345196044' && message.interaction.name === 'work')) {
+			} else if (!(message.author.id === '952125649345196044' && workers.includes( message.interaction.user.id ) && message.interaction.name === 'work')) {
 				activity++;
 			}
 		}
+		
 		return activity;
 	} ) );
 }
