@@ -23,29 +23,32 @@ export default async function work(account, data, timeout) {
 	timeout += config.cant_c_me * Math.random();
 	let working_at = getLocaleDate();
 	working_at.setMilliseconds( working_at.getMilliseconds() + timeout );
-	console.log( account.id, 'activity'.cyan(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
+	console.log( account.id, 'Working at', working_at.toLocaleString( 'fr-EU' ) );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
 	/** Activity count */
-	if (account.id === mainAccount.id) {
+	if /** Main account */ (account.id === mainAccount.id) {
 		if (activity < 1) {
+			console.log( account.id.toString().cyan(), 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
 			if (Math.random() < 0.9) {
 				const timeout = config.one_hour / 6 + config.cooldown * Math.random();
-				console.log( account.id, 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
 				return work( account, data, timeout );
 			}
 		} else {
+			console.log( account.id.toString().cyan(), 'activity'.cyan(), activity );
 			if (Math.random() < 0.1) {
-				const timeout = config.cant_c_me * Math.random();
+				const timeout = config.retry;
 				work( account, data, timeout );
 			}
 		}
-	} else { /** Secondary accounts work less */
+		
+	} else /** Secondary accounts work less */{
 		if (activity <= 4) {
-			timeout = config.work_interval + config.cooldown * Math.random();
+			console.log( account.id.toString().cyan(), 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
+			timeout = config.retry;
 			return work( account, data, timeout );
 		}
-		
+		console.log( account.id.toString().cyan(), 'activity'.cyan(), activity );
 	}
 	
 	/* Work less at night
