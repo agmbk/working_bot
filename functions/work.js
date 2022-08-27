@@ -21,8 +21,8 @@ export default async function work(account, data, timeout) {
 	
 	const activity = await getActivity( account );
 	timeout += config.cant_c_me * Math.random();
-	const working_at = getDateObject().setMinutes( getDateObject().getMinutes() + (timeout / config.one_minute) );
-	console.log( account.id, 'activity'.cyan(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toString() );
+	const working_at = getDate(getDateObject().setMinutes( getDateObject().getMinutes() + (timeout / config.one_minute) ));
+	console.log( account.id, 'activity'.cyan(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
 	/* Activity count */
