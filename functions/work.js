@@ -135,14 +135,19 @@ export default async function work(account, data, timeout) {
 							money_mess_date.setMilliseconds(0);
 							console.log( `Money message ${money_mess_date === data.date} ${getLocaleDateString(money_mess_date).cyan()}, UTC ${money_mess_date.getTime()} | Last in DB ${getLocaleDateString(data.date).cyan()}, UTC ${data.date.getTime()} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
 							if (money_mess_date > data.date) return parseInt( message.content.split( '**' )[1] );
+							else if (money_mess_date === data.date) return money_mess_date;
 						}
 					}
 					return 0;
 					
 				} ) );
 			}
+			if ( money_mess_date  instanceof Date) {
+				const timeout = 60 - (getLocaleDate() - money_mess_date) / config.one_minute;
+				console.log(account.id.red(), 'has already worked, waiting', timeout, 'mins');
+				//return work( account, data, timeout );
 			
-			if (money && res.ok && money_mess_date) {
+			} else if (money && res.ok && money_mess_date) {
 				data.date = money_mess_date;
 				data.money_total += money;
 				data.money += money;
