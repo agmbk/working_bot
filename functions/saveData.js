@@ -1,6 +1,5 @@
 import config from '../config.json' assert { type: 'json' };
 import database from '../data/database.js';
-import { getLocaleDate, getMessageUTCDate } from './dateHandler.js';
 
 /**
  * @name saveData
@@ -12,7 +11,7 @@ import { getLocaleDate, getMessageUTCDate } from './dateHandler.js';
  * @returns {void}
  */
 export default async function saveData(data, id, date) {
-	console.log( 'saveData'.red(), date, date.toUTCString());
+	console.log( 'saveData'.red(), date, date.toUTCString() );
 	try {
 		const query = `
             UPDATE ${config.table}

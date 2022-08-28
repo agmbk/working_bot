@@ -19,7 +19,7 @@ async function work_retry(account, data) {
 	
 	const timeout = config.retry;
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
-	work(account, data, timeout)
+	work( account, data, timeout );
 }
 
 /**
@@ -37,9 +37,9 @@ export async function work_cant_c_me(account, data, timeout) {
 	timeout += config.cant_c_me * Math.random();
 	let working_at = new Date();
 	working_at.setMilliseconds( working_at.getMilliseconds() + timeout );
-	console.log( account.id.toString().cyan(), 'Working at', getLocaleDateString( working_at ).green(), 'in', timeout  / config.one_minute);
+	console.log( account.id.toString().cyan(), 'Working at', getLocaleDateString( working_at ).green(), 'in', timeout / config.one_minute );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
-	work(account, data)
+	work( account, data );
 }
 
 /**
@@ -58,11 +58,11 @@ export default async function work(account, data) {
 		if (activity < 1) {
 			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting...' );
 			if (Math.random() < 0.9) {
-				return work_retry( account, data )
+				return work_retry( account, data );
 			}
 		} else {
 			if (Math.random() < 0.1) {
-				return work_retry( account, data )
+				return work_retry( account, data );
 			}
 			console.log( account.id.toString().cyan(), 'activity'.cyan(), activity );
 		}
@@ -71,7 +71,7 @@ export default async function work(account, data) {
 		await new Promise( resolve => setTimeout( resolve, config.one_minute ) );
 		if (activity <= 6) {
 			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting...' );
-			return work_retry( account, data )
+			return work_retry( account, data );
 		}
 		console.log( account.id.toString().cyan(), 'activity'.cyan(), activity );
 	}
@@ -156,21 +156,22 @@ export default async function work(account, data) {
 					for (const message of json) {
 						if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
 							money_mess_date = new Date( message.timestamp );
-							money_mess_date.setMilliseconds(0);
-							console.log( `Money message ${money_mess_date === data.date} ${getLocaleDateString(money_mess_date).cyan()}, UTC ${money_mess_date.getTime()} | Last in DB ${getLocaleDateString(data.date).cyan()}, UTC ${data.date.getTime()} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
-							if (money_mess_date > data.date) return parseInt( message.content.split( '**' )[1] );
-							else if (money_mess_date === data.date) return money_mess_date;
+							money_mess_date.setMilliseconds( 0 );
+							console.log( `Money message ${money_mess_date === data.date} ${getLocaleDateString( money_mess_date ).cyan()}, UTC ${money_mess_date.getTime()} | Last in DB ${getLocaleDateString( data.date ).cyan()}, UTC ${data.date.getTime()} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
+							if (money_mess_date > data.date) {
+								return parseInt( message.content.split( '**' )[1] );
+							} else if (money_mess_date === data.date) return money_mess_date;
 						}
 					}
 					return 0;
 					
 				} ) );
 			}
-			if ( money instanceof Date) {
+			if (money instanceof Date) {
 				const timeout = 60 - (new Date() - money_mess_date) / config.one_minute;
-				console.log(account.id.red(), 'has already worked, waiting', timeout.toFixed(0), 'mins');
+				console.log( account.id.red(), 'has already worked, waiting', timeout.toFixed( 0 ), 'mins' );
 				return work_cant_c_me( account, data, timeout * config.one_minute );
-			
+				
 			} else if (money && res.ok && money_mess_date) {
 				data.date = money_mess_date;
 				data.money_total += money;
