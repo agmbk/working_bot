@@ -75,7 +75,7 @@ const data = await Promise.all( accounts.map( async (account, id) => {
 		res = await database.query( query );
 	}
 	
-	res.rows[0].date = getLocaleDate(res.rows[0].date);
+	//res.rows[0].date = getLocaleDate(res.rows[0].date);
 	return res.rows[0];
 } ) );
 
