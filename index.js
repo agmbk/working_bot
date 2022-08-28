@@ -58,7 +58,7 @@ try {
 			return 0;
 			
 		} ) );
-		console.log( new Date(money_mess_date.toString()).toUTCString().red() );
+		console.log( new Date(money_mess_date.toString()).toUTCString().red(), getMessageUTCDate(money_mess_date) );
 		
 		const account_data = data[id];
 		const wait_time = 60 - (getLocaleDate().getTime() - account_data.date.getTime()) / config.one_minute;

@@ -48,7 +48,7 @@ export function getUTCDateToLocale(date) {
  * @returns {string} date to UTC string
  */
 export function getMessageUTCDate(date) {
-	return new Date(date.replace('GMT+0000', 'GMT+0200')).toUTCString()
+	return new Date(date.toString().replace('GMT+0000', 'GMT+0200')).toUTCString()
 }
 
 /**
