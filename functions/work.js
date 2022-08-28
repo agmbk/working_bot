@@ -5,6 +5,7 @@ import { getLocaleDate, getLocaleDateString, isCurrentDay } from './dateHandler.
 import saveData from './saveData.js';
 import fetchResFormat from './fetchResFormat.js';
 import getActivity from './getActivity.js';
+import data from '../data/databaseData.js';
 
 /**
  * @name work
@@ -130,8 +131,8 @@ export default async function work(account, data, timeout) {
 					/** Get the last message > DB date */
 					for (const message of json) {
 						if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
-							money_mess_date = getLocaleDate( message.timestamp );
-							console.log( `Money message ${money_mess_date.toJSON()} | Last in DB ${data.date}, Timestamp : ${message.timestamp} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
+							money_mess_date = new Date( message.timestamp );
+							console.log( `Money message ${money_mess_date == account_data.date} ${getLocaleDateString(money_mess_date).cyan()}, UTC ${money_mess_date.toUTCString()} | Last in DB ${getLocaleDateString(account_data.date).cyan()}, UTC ${account_data.date.toUTCString()} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
 							if (money_mess_date > data.date) return parseInt( message.content.split( '**' )[1] );
 						}
 					}
