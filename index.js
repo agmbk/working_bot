@@ -21,7 +21,7 @@ try {
 	accounts.map( account => {
 		if (account.pay) {
 			console.log( `${account.id.cyan()} is paying ${mainAccount.id.cyan()}` );
-			setTimeout( () => pay( account, mainAccount ), config.one_hour * 72 );
+			setTimeout( () => pay( account, mainAccount ), config.pay_interval );
 		}
 	} );
 	
@@ -32,7 +32,7 @@ try {
 		
 		if (wait_time > 0) {
 			const timeout = wait_time * config.one_minute;
-			console.log( `${account.id.cyan()} can works in ${wait_time.toFixed( 0 ).cyan()} mins | Date: ${getLocaleDateString()}` );
+			// console.log( `${account.id.cyan()} can works in ${wait_time.toFixed( 0 ).cyan()} mins | Date: ${getLocaleDateString()}` );
 			work_cant_c_me( account, account_data, timeout );
 			
 		} else {
