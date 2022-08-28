@@ -45,8 +45,7 @@ export default async function work(account, data) {
 			date.setHours(date.getHours() + difference)
 			date.setMinutes(0)
 			date.setSeconds(0)
-			
-			console.log('Night will end in', difference, 'hours. Waking at', getLocaleDateString(date), (date - new Date()) / config.one_hour);
+			console.log('Night will end in', difference, 'hours. Waking at', getLocaleDateString(date), (date - getLocaleDate()) / config.one_hour);
 			await new Promise( resolve => setTimeout( resolve, difference * config.one_hour ) );
 		} else {
 			const difference = config.night.at(-1) - hours
