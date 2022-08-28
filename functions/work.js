@@ -144,7 +144,7 @@ export default async function work(account, data, timeout) {
 					
 				} ) );
 			}
-			if ( money_mess_date  instanceof Date) {
+			if ( money instanceof Date) {
 				const timeout = 60 - (new Date() - money_mess_date) / config.one_minute;
 				console.log(account.id.red(), 'has already worked, waiting', timeout, 'mins');
 				return work( account, data, timeout * config.one_minute );
