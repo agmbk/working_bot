@@ -9,7 +9,7 @@
   "pay_interval": 1512e6,
   "work_interval": 3.6e6,
   "cant_c_me": 1e6,
-  "retry": 300000,
+  "retry": 3e5,
   "timezone_offset": -120,
   "night": [
     1,

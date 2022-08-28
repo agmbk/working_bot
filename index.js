@@ -3,7 +3,7 @@ import data from './data/databaseData.js';
 import accounts from './data/accounts.js';
 import mainAccount from './data/mainAccount.js';
 import { getLocaleDate, getLocaleDateString } from './functions/dateHandler.js';
-import work from './functions/work.js';
+import work, { work_cant_c_me } from './functions/work.js';
 import pay from './functions/pay.js';
 import './data/color.js';
 import fetch from 'node-fetch';
@@ -34,11 +34,11 @@ try {
 		if (wait_time > 0) {
 			const timeout = wait_time * config.one_minute;
 			console.log( `${account.id.cyan()} can works in ${wait_time.toFixed( 0 ).cyan()} mins | Date: ${getLocaleDateString()}` );
-			work( account, account_data, timeout );
+			work_cant_c_me( account, account_data, timeout );
 			
 		} else {
 			console.log( `${account.id.cyan()} can works now | Date: ${getLocaleDateString()}` );
-			work( account, account_data, 0 );
+			work( account, account_data );
 		}
 	} );
 	

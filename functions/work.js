@@ -1,11 +1,29 @@
 import config from '../config.json' assert { type: 'json' };
 import fetch from 'node-fetch';
 import mainAccount from '../data/mainAccount.js';
-import { getLocaleDate, getLocaleDateString, isCurrentDay } from './dateHandler.js';
+import { getLocaleDateString, isCurrentDay } from './dateHandler.js';
 import saveData from './saveData.js';
 import fetchResFormat from './fetchResFormat.js';
 import getActivity from './getActivity.js';
-import data from '../data/databaseData.js';
+
+async function work_retry(account, data) {
+	/** Retry timeout */
+	
+	const timeout = config.retry;
+	await new Promise( resolve => setTimeout( resolve, timeout ) );
+	work(account, data, timeout)
+}
+
+export async function work_cant_c_me(account, data, timeout) {
+	/** Waiting timeout */
+	
+	timeout += config.cant_c_me * Math.random();
+	let working_at = new Date();
+	working_at.setMilliseconds( working_at.getMilliseconds() + timeout );
+	console.log( account.id.toString().cyan(), 'Working at', getLocaleDateString( working_at ).green(), working_at, timeout );
+	await new Promise( resolve => setTimeout( resolve, timeout ) );
+	work(account, data)
+}
 
 /**
  * @name work
@@ -18,16 +36,7 @@ import data from '../data/databaseData.js';
  * @param {int} timeout time in milliseconds to wait before working
  * @returns {void}
  */
-export default async function work(account, data, timeout) {
-	
-	/** Waiting timeout */
-	await new Promise( resolve => setTimeout( resolve, 10000 ) );
-	timeout += config.cant_c_me * Math.random();
-	let working_at = new Date();
-	working_at.setMilliseconds( working_at.getMilliseconds() + timeout );
-	console.log( account.id.toString().cyan(), 'Working at', getLocaleDateString(working_at).green(), working_at, timeout );
-	
-	await new Promise( resolve => setTimeout( resolve, timeout ) );
+export default async function work(account, data) {
 	
 	/** Activity count */
 	const activity = await getActivity( account );
@@ -35,22 +44,20 @@ export default async function work(account, data, timeout) {
 		if (activity < 1) {
 			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting...' );
 			if (Math.random() < 0.9) {
-				const timeout = config.one_hour / 6 + config.cooldown * Math.random();
-				return work( account, data, timeout );
+				return work_retry( account, data )
 			}
 		} else {
-			console.log( account.id.toString().cyan(), 'activity'.cyan(), activity );
 			if (Math.random() < 0.1) {
-				const timeout = config.retry;
-				work( account, data, timeout );
+				return work_retry( account, data )
 			}
+			console.log( account.id.toString().cyan(), 'activity'.cyan(), activity );
 		}
 		
 	} else /** Secondary accounts work less */{
+		await new Promise( resolve => setTimeout( resolve, config.one_minute ) );
 		if (activity <= 6) {
 			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting...' );
-			timeout = config.retry;
-			return work( account, data, timeout );
+			return work_retry( account, data )
 		}
 		console.log( account.id.toString().cyan(), 'activity'.cyan(), activity );
 	}
@@ -148,7 +155,7 @@ export default async function work(account, data, timeout) {
 			if ( money instanceof Date) {
 				const timeout = 60 - (new Date() - money_mess_date) / config.one_minute;
 				console.log(account.id.red(), 'has already worked, waiting', timeout.toFixed(0), 'mins');
-				return work( account, data, timeout * config.one_minute );
+				return work_cant_c_me( account, data, timeout * config.one_minute );
 			
 			} else if (money && res.ok && money_mess_date) {
 				data.date = money_mess_date;
@@ -159,22 +166,18 @@ export default async function work(account, data, timeout) {
 				
 				const timeout = config.work_interval + config.cooldown * Math.random();
 				await saveData( data, account.id, money_mess_date );
-				return work( account, data, timeout );
+				return work_cant_c_me( account, data, timeout );
 				
 			} else {
 				console.warn( `${account.id.red()} failed ( ${fetchResFormat( res )} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data.error} | Date: ${getLocaleDateString()} )` );
 				data.error += 1;
-				
-				const timeout = config.retry + config.cooldown * Math.random();
-				return work( account, data, timeout );
+				return work_retry( account, data );
 			}
 		} );
 	} catch (e) {
 		console.error( 'Work has crashed'.red(), e );
 		data.error += 1;
-		
-		const timeout = config.retry + config.cooldown * Math.random();
-		return work( account, data, timeout );
+		return work_retry( account, data );
 	}
 	
 }
