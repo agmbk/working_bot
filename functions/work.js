@@ -34,7 +34,7 @@ export async function work_cant_c_me(account, data, timeout) {
  */
 export default async function work(account, data) {
 	
-	const date = getLocaleDate()
+	let date = getLocaleDate()
 	const hours = date.getHours();
 
 	console.log('Hours', config.night.at(-1) - getLocaleDate().getHours());
@@ -45,7 +45,8 @@ export default async function work(account, data) {
 			date.setHours(date.getHours() + difference)
 			date.setMinutes(0)
 			date.setSeconds(0)
-			console.log('Night will end in', difference, 'hours. Waking at', getLocaleDateString(date), (date - getLocaleDate()) / config.one_hour);
+			date = date - getLocaleDate()
+			console.log('Night will end in', difference, 'hours. Waking at',getLocaleDateString( getLocaleDate().setTime(getLocaleDate().getTime() + date)), date / config.one_hour);
 			await new Promise( resolve => setTimeout( resolve, difference * config.one_hour ) );
 		} else {
 			const difference = config.night.at(-1) - hours
