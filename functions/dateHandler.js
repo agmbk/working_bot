@@ -46,9 +46,9 @@ export function getMessageUTCDate(date) {
  * @returns {boolean}
  */
 export function isCurrentDay(date) {
-	const compared_date = date;
+	const compared_date = getLocaleDate(date);
 	const current_date = getLocaleDate();
-	console.log( 'isCurrentDay'.red(), 'date', date, '1', compared_date, '2', current_date );
+	console.log( 'isCurrentDay'.red(), '1', getLocaleDateString(compared_date), '2', getLocaleDateString(current_date) );
 	return !(
 		compared_date.getDate() === current_date.getDate() &&
 		compared_date.getMonth() === current_date.getMonth() &&
