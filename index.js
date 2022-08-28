@@ -31,41 +31,6 @@ try {
 		const account_data = data[id];
 		const wait_time = 60 - (getLocaleDate() - account_data.date) / config.one_minute;
 		
-		
-		let money_mess_date;
-		await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {
-			'headers': {
-				'accept': '*/*',
-				'accept-language': 'fr,fr-FR;q=0.9',
-				'authorization': account.authorization,
-				'sec-fetch-dest': 'empty',
-				'sec-fetch-mode': 'cors',
-				'sec-fetch-site': 'same-origin',
-				'x-debug-options': 'bugReporterEnabled',
-				'x-discord-locale': 'en-GB',
-			},
-			'referrer': 'https://discord.com/channels/902947280162811975/952558030556389466',
-			'referrerPolicy': 'strict-origin-when-cross-origin',
-			'body': null,
-			'method': 'GET',
-			'mode': 'cors',
-		} ).then( res => res.json().then( json => {
-			
-			/** Get the last message > DB date */
-			for (const message of json) {
-				if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
-					money_mess_date = new Date( message.timestamp );
-					console.log( `Money message ${money_mess_date == account_data.date} ${getLocaleDateString(money_mess_date).cyan()}, UTC ${money_mess_date.toUTCString()} | Last in DB ${getLocaleDateString(account_data.date).cyan()}, UTC ${account_data.date.toUTCString()} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
-					if (money_mess_date > data.date) return parseInt( message.content.split( '**' )[1] );
-				}
-			}
-			return 0;
-			
-		} ) );
-		
-		
-		
-		console.log(account_data.date, getLocaleDate());
 		if (wait_time > 0) {
 			const timeout = wait_time * config.one_minute;
 			console.log( `${account.id.cyan()} will works in ${wait_time.toFixed( 0 ).cyan()} mins | Date: ${getLocaleDateString()}` );

@@ -24,13 +24,13 @@ export default async function work(account, data, timeout) {
 	//timeout += config.cant_c_me * Math.random();
 	let working_at = getLocaleDate();
 	working_at.setMilliseconds( working_at.getMilliseconds() + timeout );
-	console.log( account.id.toString().cyan(), 'Working at', working_at.toLocaleString( 'fr-EU' ) );
+	console.log( account.id.toString().cyan(), 'Working at', getLocaleDateString(working_at) );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
 	/** Activity count */
 	if /** Main account */ (account.id === mainAccount.id) {
 		if (activity < 1) {
-			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
+			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting...' );
 			if (Math.random() < 0.9) {
 				const timeout = config.one_hour / 6 + config.cooldown * Math.random();
 				return work( account, data, timeout );
@@ -44,11 +44,11 @@ export default async function work(account, data, timeout) {
 		}
 		
 	} else /** Secondary accounts work less */{
-		//if (activity <= 7) {
-			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
+		if (activity <= 6) {
+			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting...' );
 			timeout = config.retry;
 			return work( account, data, timeout );
-		//}
+		}
 		console.log( account.id.toString().cyan(), 'activity'.cyan(), activity );
 	}
 	
