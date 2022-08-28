@@ -37,7 +37,7 @@ export async function work_cant_c_me(account, data, timeout) {
 	timeout += config.cant_c_me * Math.random();
 	let working_at = new Date();
 	working_at.setMilliseconds( working_at.getMilliseconds() + timeout );
-	console.log( account.id.toString().cyan(), 'Working at', getLocaleDateString( working_at ).green(), working_at, timeout );
+	console.log( account.id.toString().cyan(), 'Working at', getLocaleDateString( working_at ).green(), 'in', timeout  / config.one_minute);
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	work(account, data)
 }

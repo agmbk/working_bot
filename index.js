@@ -2,11 +2,10 @@ import config from './config.json' assert { type: 'json' };
 import data from './data/databaseData.js';
 import accounts from './data/accounts.js';
 import mainAccount from './data/mainAccount.js';
-import { getLocaleDate, getLocaleDateString } from './functions/dateHandler.js';
+import { getLocaleDateString } from './functions/dateHandler.js';
 import work, { work_cant_c_me } from './functions/work.js';
 import pay from './functions/pay.js';
 import './data/color.js';
-import fetch from 'node-fetch';
 
 
 try {
