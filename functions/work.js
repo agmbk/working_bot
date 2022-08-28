@@ -23,7 +23,7 @@ export default async function work(account, data, timeout) {
 	timeout += config.cant_c_me * Math.random();
 	let working_at = getLocaleDate();
 	working_at.setMilliseconds( working_at.getMilliseconds() + timeout );
-	console.log( account.id, 'Working at', working_at.toLocaleString( 'fr-EU' ) );
+	console.log( account.id.toString().cyan(), 'Working at', working_at.toLocaleString( 'fr-EU' ) );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
 	/** Activity count */
