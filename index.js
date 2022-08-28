@@ -55,7 +55,7 @@ try {
 			for (const message of json) {
 				if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
 					money_mess_date = new Date( message.timestamp );
-					console.log( `Money message ${money_mess_date} ${money_mess_date.toUTCString()} | Last in DB ${new Date(account_data.date)}, Timestamp : ${message.timestamp} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
+					console.log( `Money message ${getLocaleDateString(money_mess_date)} ${money_mess_date.toUTCString()} | Last in DB ${new Date(account_data.date)}, Timestamp : ${message.timestamp} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
 					if (money_mess_date > data.date) return parseInt( message.content.split( '**' )[1] );
 				}
 			}
