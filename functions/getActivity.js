@@ -9,13 +9,13 @@ import accounts from '../data/accounts.js';
  * @return {Promise<number>} the message count of others since the last money message
  */
 export default async function getActivity(account) {
-	const workers = accounts.map(worker => worker.id)
+	const workers = accounts.map( worker => worker.id );
 	/*
-	const workers = (() => {
-		let workers = [];
-		accounts.forEach( worker => {if (worker.id !== account.id) workers.push( worker.id );} );
-		return workers;
-	})();*/
+	 const workers = (() => {
+	 let workers = [];
+	 accounts.forEach( worker => {if (worker.id !== account.id) workers.push( worker.id );} );
+	 return workers;
+	 })();*/
 	return await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {
 		'headers': {
 			'accept': '*/*',
@@ -38,7 +38,7 @@ export default async function getActivity(account) {
 		for (const message of json) {
 			if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
 				return activity;
-			} else if (!(workers.includes(message.author.id) || message.author.id === '952125649345196044' && workers.includes( message.interaction.user.id ) )) {
+			} else if (!(workers.includes( message.author.id ) || message.author.id === '952125649345196044' && workers.includes( message.interaction.user.id ))) {
 				activity++;
 			}
 		}

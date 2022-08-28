@@ -37,7 +37,7 @@ export function getLocaleDateString(date) {
  * @returns {Date} date to Date
  */
 export function getUTCDateToLocale(date) {
-	date.setTime( date.getTime() - config.timezone_offset * 60000 );
+	date.setTime( date.getTime() - (config.timezone_offset * 60000) );
 	return date;
 }
 
@@ -48,8 +48,7 @@ export function getUTCDateToLocale(date) {
  * @returns {string} date to UTC string
  */
 export function getMessageUTCDate(date) {
-	console.log(getLocaleDate(date), getLocaleDate(date).toUTCString(), getLocaleDate(date.toString().replace('GMT+0000', 'GMT+0200')).toUTCString() );
-	return new Date(date.toString().replace('GMT+0000', 'GMT+0200')).toUTCString()
+	return new Date( date.toString().replace( 'GMT+0000', 'GMT+0200' ) ).toUTCString();
 }
 
 /**

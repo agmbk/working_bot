@@ -13,8 +13,8 @@ import { getLocaleDate, getMessageUTCDate } from './dateHandler.js';
  */
 export default async function saveData(data, id, date) {
 	console.log( 'saveData'.red(), date, date.toUTCString(), getLocaleDate( date ) );
-	date = getMessageUTCDate(date);
-	console.log(date);
+	date = getMessageUTCDate( date );
+	console.log( date );
 	try {
 		const query = `
             UPDATE ${config.table}

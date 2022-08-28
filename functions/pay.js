@@ -15,7 +15,7 @@ import getActivity from './getActivity.js';
 export default async function pay(payer, receiver) {
 	
 	const activity = await getActivity( payer );
-	const timeout = config.one_hour * 2 + config.cant_c_me * Math.random()
+	const timeout = config.one_hour * 2 + config.cant_c_me * Math.random();
 	if (activity < 10) {
 		setTimeout( () => pay( payer, receiver ), timeout );
 	}
