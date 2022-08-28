@@ -21,10 +21,10 @@ import data from '../data/databaseData.js';
 export default async function work(account, data, timeout) {
 	
 	const activity = await getActivity( account );
-	//timeout += config.cant_c_me * Math.random();
+	timeout += config.cant_c_me * Math.random();
 	let working_at = getLocaleDate();
 	working_at.setMilliseconds( working_at.getMilliseconds() + timeout );
-	console.log( account.id.toString().cyan(), 'Working at', getLocaleDateString(working_at) );
+	console.log( account.id.toString().cyan(), 'Working at', getLocaleDateString(working_at), working_at, timeout );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
 	/** Activity count */
@@ -145,7 +145,7 @@ export default async function work(account, data, timeout) {
 			if ( money_mess_date  instanceof Date) {
 				const timeout = 60 - (getLocaleDate() - money_mess_date) / config.one_minute;
 				console.log(account.id.red(), 'has already worked, waiting', timeout, 'mins');
-				//return work( account, data, timeout );
+				return work( account, data, timeout * config.one_minute );
 			
 			} else if (money && res.ok && money_mess_date) {
 				data.date = money_mess_date;
