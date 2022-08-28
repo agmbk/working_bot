@@ -21,10 +21,11 @@ import data from '../data/databaseData.js';
 export default async function work(account, data, timeout) {
 	
 	/** Waiting timeout */
+	await new Promise( resolve => setTimeout( resolve, 10000 ) );
 	timeout += config.cant_c_me * Math.random();
 	let working_at = new Date();
 	working_at.setMilliseconds( working_at.getMilliseconds() + timeout );
-	console.log( account.id.toString().cyan(), 'Working at', getLocaleDateString(working_at), working_at, timeout );
+	console.log( account.id.toString().cyan(), 'Working at', getLocaleDateString(working_at).green(), working_at, timeout );
 	
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	
@@ -146,7 +147,7 @@ export default async function work(account, data, timeout) {
 			}
 			if ( money instanceof Date) {
 				const timeout = 60 - (new Date() - money_mess_date) / config.one_minute;
-				console.log(account.id.red(), 'has already worked, waiting', timeout, 'mins');
+				console.log(account.id.red(), 'has already worked, waiting', timeout.toFixed(0), 'mins');
 				return work( account, data, timeout * config.one_minute );
 			
 			} else if (money && res.ok && money_mess_date) {
