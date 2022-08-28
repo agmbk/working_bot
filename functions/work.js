@@ -34,7 +34,9 @@ export async function work_cant_c_me(account, data, timeout) {
  */
 export default async function work(account, data) {
 	
-	if (!(work_activity( account ))) {
+	const activity = work_activity( account );
+	
+	if (!activity) {
 		return work_retry( account, data );
 	}
 	
