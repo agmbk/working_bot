@@ -6,6 +6,14 @@ import saveData from './saveData.js';
 import fetchResFormat from './fetchResFormat.js';
 import getActivity from './getActivity.js';
 
+/**
+ * @name work
+ * @description Work retry executor
+ *
+ * @param {Object} account account
+ * @param {Object} data data corresponding to the account
+ * @returns {void}
+ */
 async function work_retry(account, data) {
 	/** Retry timeout */
 	
@@ -14,6 +22,15 @@ async function work_retry(account, data) {
 	work(account, data, timeout)
 }
 
+/**
+ * @name work
+ * @description Work timeout executor
+ *
+ * @param {Object} account account
+ * @param {Object} data data corresponding to the account
+ * @param {int} timeout time in milliseconds to wait before working
+ * @returns {void}
+ */
 export async function work_cant_c_me(account, data, timeout) {
 	/** Waiting timeout */
 	
@@ -27,13 +44,10 @@ export async function work_cant_c_me(account, data, timeout) {
 
 /**
  * @name work
- * @description Work, fetch gain and save it into the DB, every work_interval
- * first fetch: works
- * second fetch: fetch money gain amount
+ * @description Work if channel is active, fetch gain and save it into the DB, every work_interval
  *
  * @param {Object} account account
  * @param {Object} data data corresponding to the account
- * @param {int} timeout time in milliseconds to wait before working
  * @returns {void}
  */
 export default async function work(account, data) {
