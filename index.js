@@ -29,8 +29,8 @@ try {
 	/** Work */
 	accounts.map( async (account, id) => {
 		const account_data = data[id];
-		const wait_time = 60 - (getLocaleDate() - account_data.date) / config.one_minute;
-		console.log(wait_time, 60 - (new Date() - account_data.date) / config.one_minute);
+		const wait_time = 60 - (new Date() - account_data.date) / config.one_minute;
+		console.log('wait_time', wait_time);
 		if (wait_time > 0) {
 			const timeout = wait_time * config.one_minute;
 			console.log( `${account.id.cyan()} will works in ${wait_time.toFixed( 0 ).cyan()} mins | Date: ${getLocaleDateString()}` );
