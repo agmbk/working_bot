@@ -161,14 +161,14 @@ async function work_activity(account) {
 	if /** Main account */ (account.id === mainAccount.id) {
 		if (activity < 1) {
 			if (Math.random() < 0.9) {
-				console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting...' );
+				console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting... | Date:', getLocaleDateString() );
 				return false;
 			}
 		}
 		
 	} else /** Secondary accounts */{
 		if (activity <= 6) {
-			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting...' );
+			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting...| Date:', getLocaleDateString() );
 			return false;
 		}
 	}
