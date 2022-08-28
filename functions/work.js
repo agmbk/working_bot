@@ -34,11 +34,26 @@ export async function work_cant_c_me(account, data, timeout) {
  */
 export default async function work(account, data) {
 	
-	const activity = work_activity( account );
+	let activity = work_activity( account );
+	console.log('activity'.red(), activity);
 	
-	if (!activity) {
-		return work_retry( account, data );
+	activity = await getActivity( account );
+	if /** Main account */ (account.id === mainAccount.id) {
+		if (activity < 1) {
+			if (Math.random() < 0.9) {
+				console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting... | Date:', getLocaleDateString() );
+				return work_retry(account, data)
+			}
+		}
+		
+	} else /** Secondary accounts */{
+		if (activity <= 6) {
+			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting...| Date:', getLocaleDateString() );
+			return work_retry(account, data)
+		}
 	}
+	console.log( account.id.toString().cyan(), 'activity'.cyan(), activity );
+	
 	
 	try {
 		await fetch( 'https://discord.com/api/v9/interactions', {
