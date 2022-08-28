@@ -34,7 +34,7 @@ export async function work_cant_c_me(account, data, timeout) {
  */
 export default async function work(account, data) {
 	
-	let activity = work_activity( account );
+	let activity = await work_activity( account );
 	console.log('activity'.red(), activity);
 	
 	activity = await getActivity( account );
