@@ -2,7 +2,7 @@ import config from '../config.json' assert { type: 'json' };
 import database from './database.js';
 import accounts from './accounts.js';
 import fs from 'fs';
-import { getLocaleDate, getUTCDateToLocale } from '../functions/dateHandler.js';
+import { getLocaleDate } from '../functions/dateHandler.js';
 
 
 await database.connect();

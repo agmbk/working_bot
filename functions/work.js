@@ -20,7 +20,7 @@ import getActivity from './getActivity.js';
 export default async function work(account, data, timeout) {
 	
 	const activity = await getActivity( account );
-	timeout += config.cant_c_me * Math.random();
+	//timeout += config.cant_c_me * Math.random();
 	let working_at = getLocaleDate();
 	working_at.setMilliseconds( working_at.getMilliseconds() + timeout );
 	console.log( account.id.toString().cyan(), 'Working at', working_at.toLocaleString( 'fr-EU' ) );
@@ -29,7 +29,7 @@ export default async function work(account, data, timeout) {
 	/** Activity count */
 	if /** Main account */ (account.id === mainAccount.id) {
 		if (activity < 1) {
-			console.log( account.id.toString().cyan(), 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
+			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
 			if (Math.random() < 0.9) {
 				const timeout = config.one_hour / 6 + config.cooldown * Math.random();
 				return work( account, data, timeout );
@@ -43,11 +43,11 @@ export default async function work(account, data, timeout) {
 		}
 		
 	} else /** Secondary accounts work less */{
-		if (activity <= 4) {
-			console.log( account.id.toString().cyan(), 'no activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
+		//if (activity <= 4) {
+			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting', (timeout / config.one_minute).toFixed( 0 ).cyan(), 'mins. Working at', working_at.toLocaleString( 'fr-EU' ) );
 			timeout = config.retry;
 			return work( account, data, timeout );
-		}
+		//}
 		console.log( account.id.toString().cyan(), 'activity'.cyan(), activity );
 	}
 	
@@ -131,7 +131,7 @@ export default async function work(account, data, timeout) {
 					for (const message of json) {
 						if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
 							money_mess_date = getLocaleDate( message.timestamp );
-							console.log( `Money message ${money_mess_date} (${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}), Last in DB ${data.date}` );
+							console.log( `Money message ${money_mess_date} (${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}), Last in DB ${data.date}, Timestamp : ${message.timestamp}` );
 							if (money_mess_date > data.date) return parseInt( message.content.split( '**' )[1] );
 						}
 					}
@@ -141,7 +141,7 @@ export default async function work(account, data, timeout) {
 			}
 			
 			if (money && res.ok && money_mess_date) {
-				data.date = getLocaleDate();
+				data.date = money_mess_date;
 				data.money_total += money;
 				data.money += money;
 				

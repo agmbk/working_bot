@@ -12,9 +12,7 @@ import { getLocaleDate, getMessageUTCDate } from './dateHandler.js';
  * @returns {void}
  */
 export default async function saveData(data, id, date) {
-	console.log( 'saveData'.red(), date, date.toUTCString(), getLocaleDate( date ) );
-	date = getMessageUTCDate( date );
-	console.log( date );
+	console.log( 'saveData'.red(), date, date.toUTCString(), getLocaleDate( date ), getMessageUTCDate( date ) );
 	try {
 		const query = `
             UPDATE ${config.table}
@@ -26,12 +24,12 @@ export default async function saveData(data, id, date) {
                 count            = ${data.count},
                 count_mean       = ${data.count_mean},
                 error            = ${data.error},
-                date             = '${date.toUTCString()}'
+                date             = '${getMessageUTCDate( date )}'
             WHERE id = '${id}'
 		`;
 		await database.query( query );
 		
 	} catch (e) {
-		console.error( e );
+		console.error( 'saveData has crashed'.red(), e );
 	}
 }

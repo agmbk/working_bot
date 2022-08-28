@@ -1,5 +1,3 @@
-import config from '../config.json' assert { type: 'json' };
-
 /**
  * @name getLocaleDate
  * @exports
@@ -28,17 +26,6 @@ export function getLocaleDate(date) {
  */
 export function getLocaleDateString(date) {
 	return getLocaleDate( date ).toLocaleString( 'fr-EU' );
-}
-
-/**
- * @name getUTCDate
- * @exports
- * @description Get french date, to UTC Date
- * @returns {Date} date to Date
- */
-export function getUTCDateToLocale(date) {
-	date.setTime( date.getTime() - (config.timezone_offset * 60000) );
-	return date;
 }
 
 /**
