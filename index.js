@@ -2,10 +2,9 @@ import config from './config.json' assert { type: 'json' };
 import data from './data/databaseData.js';
 import accounts from './data/accounts.js';
 import mainAccount from './data/mainAccount.js';
-import { getLocaleDateString } from './functions/dateHandler.js';
-import work, { work_cant_c_me } from './functions/work.js';
 import pay from './functions/pay.js';
 import './data/color.js';
+import workHandler from './functions/work_object.js';
 
 
 try {
@@ -27,18 +26,8 @@ try {
 	
 	/** Work */
 	accounts.map( async (account, id) => {
-		const account_data = data[id];
-		const wait_time = 60 - (new Date() - account_data.date) / config.one_minute;
-		
-		if (wait_time > 0) {
-			const timeout = wait_time * config.one_minute;
-			// console.log( `${account.id.cyan()} can works in ${wait_time.toFixed( 0 ).cyan()} mins | Date: ${getLocaleDateString()}` );
-			work_cant_c_me( account, account_data, timeout );
-			
-		} else {
-			console.log( `${account.id.cyan()} can works now | Date: ${getLocaleDateString()}` );
-			work( account, account_data );
-		}
+		//if (account.id === mainAccount.id) new workHandler( account, data[id] );
+		new workHandler( account, data[id] );
 	} );
 	
 	console.log( '*** Work result ***'.blue() );

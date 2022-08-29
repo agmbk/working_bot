@@ -1,7 +1,7 @@
 import config from '../config.json' assert { type: 'json' };
 import fetch from 'node-fetch';
 import mainAccount from '../data/mainAccount.js';
-import { getLocaleDate, getLocaleDateString, isCurrentDay } from './dateHandler.js';
+import { getLocaleDate, getLocaleDateString } from './dateHandler.js';
 import saveData from './saveData.js';
 import fetchResFormat from './fetchResFormat.js';
 import getActivity from './getActivity.js';
@@ -34,24 +34,33 @@ export async function work_cant_c_me(account, data, timeout) {
  */
 export default async function work(account, data) {
 	
-	let date = getLocaleDate()
+	let date = getLocaleDate();
 	const hours = date.getHours();
-
-	console.log('Hours', config.night.at(-1) - getLocaleDate().getHours());
-	if (config.night.includes(getLocaleDate().getHours())) {
-		console.log('Its the night'.red());
-		if ( hours > config.night.at(-1) && hours >=  config.night[0]) {
-			const difference = 24 - hours + config.night.at(-1)
-			date.setHours(date.getHours() + difference)
-			date.setMinutes(0)
-			date.setSeconds(0)
-			date = date - getLocaleDate()
-			console.log('Night will end in', difference, 'hours. Waking at',getLocaleDateString( new Date().setTime(new Date().getTime() + date)), date / config.one_hour);
-			await new Promise( resolve => setTimeout( resolve, difference * config.one_hour ) );
+	
+	console.log( 'Hours', config.night.at( -1 ) - getLocaleDate().getHours() );
+	if (config.night.includes( getLocaleDate().getHours() )) {
+		console.log( 'Its the night'.red() );
+		if (hours > config.night.at( -1 ) && hours >= config.night[0]) {
+			const difference = 24 - hours + config.night.at( -1 );
+			date.setHours( date.getHours() + difference );
+			date.setMinutes( 0 );
+			date.setSeconds( 0 );
+			const working_date = getLocaleDateString( new Date().getTime() + date );
+			const timeout = date - getLocaleDate();
+			console.log( 'Night will end in', difference, 'hours. Waking at', working_date, timeout / config.one_hour );
+			await new Promise( resolve => setTimeout( resolve, timeout ) );
 		} else {
-			const difference = config.night.at(-1) - hours
-			console.log('Night will end in', difference, 'hours. Waking at', getLocaleDateString(date));
-			await new Promise( resolve => setTimeout( resolve, difference * config.one_hour ) );
+			const difference = config.night.at( -1 ) - hours;
+			date.setHours( date.getHours() + difference );
+			date.setMinutes( 0 );
+			date.setSeconds( 0 );
+			const working_date = getLocaleDateString( new Date().getTime() + date );
+			const timeout = date - getLocaleDate();
+			console.log( 'Night will end in', difference, 'hours. Waking at', working_date, timeout / config.one_hour );
+			await new Promise( resolve => setTimeout( resolve, timeout ) );
+			
+			console.log( 'Night will end in', difference, 'hours. Waking at', getLocaleDateString( date ) );
+			await new Promise( resolve => setTimeout( resolve, timeout ) );
 		}
 		//return;
 	}
@@ -145,7 +154,7 @@ export default async function work(account, data) {
  */
 async function work_retry(account, data) {
 	const timeout = config.retry;
-	console.log('retry', timeout / config.one_minute, 'mins' );
+	console.log( 'retry', timeout / config.one_minute, 'mins' );
 	await new Promise( resolve => setTimeout( resolve, timeout ) );
 	return work( account, data );
 }
@@ -218,14 +227,7 @@ async function work_done(account, data, money, money_mess_date, res) {
 	} else if /** Work successes */ (money && res.ok && money_mess_date) {
 		
 		/** Calculate mean of the day */
-		if (isCurrentDay( data.date )) {
-			console.log( 'new day'.red() );
-			data.total_days_count += 1;
-			data.count_mean += ((data.count - data.count_mean) / data.total_days_count);
-			data.money_mean += ((data.money - data.money_mean) / data.total_days_count);
-			data.money = 0;
-			data.count = 0;
-		}
+		
 		data.date = money_mess_date;
 		data.money_total += money;
 		data.money += money;

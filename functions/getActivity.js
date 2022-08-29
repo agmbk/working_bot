@@ -5,22 +5,18 @@ import accounts from '../data/accounts.js';
  * @name getActivity
  * @description activity of the channel from 0 to 10, 0 is inactive, 10 is very active
  *
- * @param account the account
+ * @param id account id
+ * @param authorization account authorization
  * @return {Promise<number>} the message count of others since the last money message
  */
-export default async function getActivity(account) {
+export default function getActivity(id, authorization) {
 	const workers = accounts.map( worker => worker.id );
-	/*
-	 const workers = (() => {
-	 let workers = [];
-	 accounts.forEach( worker => {if (worker.id !== account.id) workers.push( worker.id );} );
-	 return workers;
-	 })();*/
-	return await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {
+	
+	return fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {
 		'headers': {
 			'accept': '*/*',
 			'accept-language': 'fr,fr-FR;q=0.9',
-			'authorization': account.authorization,
+			'authorization': authorization,
 			'sec-fetch-dest': 'empty',
 			'sec-fetch-mode': 'cors',
 			'sec-fetch-site': 'same-origin',
@@ -36,13 +32,13 @@ export default async function getActivity(account) {
 		let activity = 0;
 		
 		for (const message of json) {
-			if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
+			if (message.author.id === '952125649345196044' && message.interaction.user.id === id && message.interaction.name === 'work') {
 				return activity;
-			} else if (!(workers.includes( message.author.id ) || message.author.id === '952125649345196044' && workers.includes( message.interaction.user.id ))) {
+				
+			} else if (!workers.includes( message.author.id ) && !(message.author.id === '952125649345196044' && workers.includes( message.interaction.user.id ))) {
 				activity++;
 			}
 		}
-		
 		return activity;
 	} ) );
 }

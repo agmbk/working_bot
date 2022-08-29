@@ -22,7 +22,7 @@ export function getLocaleDate(date) {
  * @name getLocaleDateString
  * @exports
  * @description Get french date to string
- * @returns {string} date to string
+ * @returns {string} date to date
  */
 export function getLocaleDateString(date) {
 	return getLocaleDate( date ).toLocaleString( 'fr-EU' );
