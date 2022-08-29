@@ -135,7 +135,7 @@ export default class workHandler {
 				if (message.author.id === '952125649345196044' && message.interaction.user.id === this.id && message.interaction.name === 'work') {
 					const money_mess_date = new Date( message.timestamp );
 					money_mess_date.setMilliseconds( 0 );
-					this.log( `Money message ${money_mess_date === this.data.date} ${getLocaleDateString( money_mess_date ).cyan()}, UTC ${money_mess_date.getTime()} | Last in DB ${getLocaleDateString( this.data.date ).cyan()}, UTC ${this.data.date.getTime()} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
+					this.log( `Money message ${money_mess_date === this.data.date} ${getLocaleDateString( money_mess_date ).cyan()} | Last in DB ${getLocaleDateString( this.data.date ).cyan()} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
 					
 					if /** Work is a success */ (money_mess_date > this.data.date) {
 						
