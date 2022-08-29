@@ -55,9 +55,10 @@ export default class workHandler {
 			
 			if (!this.pay) {
 				if (activity < 1) {
-					if (!(this.day.includes( getLocaleDate().getHours() ) && this.getChance( 40 ))) {
-						return this.workRetry( 'activity '.red() + activity );
-					} else if (!(!this.day.includes( getLocaleDate().getHours() ) && this.getChance( 5 ))) {
+					if (this.day.includes( getLocaleDate().getHours() ) && !this.getChance( 40 )) {
+							return this.workRetry( 'activity '.red() + activity );
+						
+					} else if (!this.day.includes( getLocaleDate().getHours() ) && !this.getChance( 5 )) {
 						return this.workRetry( 'activity '.red() + activity );
 					}
 				} else {
