@@ -27,7 +27,7 @@ export default class workHandler {
 	 */
 	log() {
 		const string = Object.values( arguments ).toString();
-		this.pay ? console.log( this.id.toString().cyan(), string ) : console.log( this.id.toString().blue(), string );
+		this.pay ? console.log( this.id.toString().purple(), string ) : console.log( this.id.toString().yellow(), string );
 	}
 	
 	/**
@@ -36,13 +36,13 @@ export default class workHandler {
 	 */
 	startup() {
 		try {
-			this.log( 'successfully started' );
+			this.log( 'successfully started'.green() );
 			const timeout = config.one_hour - (new Date() - this.data.date);
-			timeout > 0 ? this.wait( timeout, 'startup' ) : this.workActivity();
+			setTimeout( () => timeout > 0 ? this.wait( timeout, 'startup' ) : this.workActivity(), 3000 );
 			
 		} catch (e) {
 			this.log( 'workHandler has crashed'.red(), e );
-			//this.startup();
+			this.startup();
 		}
 	}
 	
@@ -51,7 +51,6 @@ export default class workHandler {
 	 * @description Start working according to the activity
 	 */
 	workActivity() {
-		this.log( 'workActivity' );
 		getActivity( this.id, this.authorization ).then( activity => {
 			
 			if (!this.pay) {

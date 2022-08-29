@@ -30,7 +30,7 @@ try {
 		new workHandler( account, data[id] );
 	} );
 	
-	setTimeout( () => console.log( '*** Work result ***'.blue() ), config.one_second * 5 );
+	setTimeout( () => console.log( '*** Work result ***'.blue() ), 0 );
 	
 } catch (e) {
 	console.error( 'GLOBAL CRASH'.red(), e );
