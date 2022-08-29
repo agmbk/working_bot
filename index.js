@@ -26,7 +26,6 @@ try {
 	
 	/** Work */
 	accounts.map( async (account, id) => {
-		//if (account.id === mainAccount.id) new workHandler( account, data[id] );
 		new workHandler( account, data[id] );
 	} );
 	

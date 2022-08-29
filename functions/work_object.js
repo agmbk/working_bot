@@ -8,7 +8,7 @@ import '../data/color.js';
 
 
 export default class workHandler {
-	day = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+	day = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0];
 	retryCount = 0;
 	retryTimeout;
 	
@@ -27,7 +27,7 @@ export default class workHandler {
 	 */
 	log() {
 		const string = Object.values( arguments ).toString();
-		this.pay ? console.log( this.id.toString().purple(), string ) : console.log( this.id.toString().yellow(), string );
+		this.pay ? console.log( this.id.toString().cyan(), string ) : console.log( this.id.toString().yellow(), string );
 	}
 	
 	/**
@@ -38,7 +38,7 @@ export default class workHandler {
 		try {
 			this.log( 'successfully started'.green() );
 			const timeout = config.one_hour - (new Date() - this.data.date);
-			setTimeout( () => timeout > 0 ? this.wait( timeout, 'startup' ) : this.workActivity(), 3000 );
+			setTimeout( () => timeout > 0 ? this.wait( timeout, 'startup' ) : this.workActivity(), config.one_second * 3 );
 			
 		} catch (e) {
 			this.log( 'workHandler has crashed'.red(), e );
@@ -55,6 +55,8 @@ export default class workHandler {
 			
 			if (!this.pay) {
 				if ((activity < 1 && !this.day.includes( getLocaleDate().getHours() )) || (activity < 1 && !(this.day.includes( getLocaleDate().getHours() ) && this.getChance( 40 )))) {
+					return this.workRetry( 'activity '.red() + activity );
+				} else if (!(!this.day.includes( getLocaleDate().getHours() ) && this.getChance( 5 ))) {
 					return this.workRetry( 'activity '.red() + activity );
 				}
 			} else {
@@ -168,8 +170,7 @@ export default class workHandler {
 	 */
 	workRetry(string) {
 		this.retryCount++;
-		if (this.retryCount >= 6) this.retryTimeout = config.one_hour;
-		this.retryTimeout = config.retry;
+		this.retryCount >= 6 ? this.retryTimeout = config.one_hour : this.retryTimeout = config.retry;
 		this.wait( this.retryTimeout, `retry ${this.retryCount} ${this.retryTimeout} | ` + string );
 	}
 	
