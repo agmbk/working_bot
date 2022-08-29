@@ -60,7 +60,7 @@ export default class workHandler {
 					return this.workRetry( 'activity '.red() + activity );
 				}
 			} else {
-				if (activity <= 6) {
+				if (activity < 6) {
 					return this.workRetry( 'activity '.red() + activity );
 				}
 			}
