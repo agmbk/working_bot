@@ -1,6 +1,6 @@
 import config from '../config.json' assert { type: 'json' };
 import fetch from 'node-fetch';
-import { getLocaleDateString, isCurrentDay } from './dateHandler.js';
+import { getLocaleDate, getLocaleDateString, isCurrentDay } from './dateHandler.js';
 import getActivity from './getActivity.js';
 import fetchResFormat from './fetchResFormat.js';
 import saveData from './saveData.js';
@@ -8,6 +8,7 @@ import '../data/color.js';
 
 
 export default class workHandler {
+	day = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
 	retryCount = 0;
 	retryTimeout;
 	
@@ -54,13 +55,15 @@ export default class workHandler {
 		getActivity( this.id, this.authorization ).then( activity => {
 			
 			if (!this.pay) {
-				activity < 1 && Math.random() < 0.9 ?
-					this.workRetry( 'activity '.red() + activity ) : this.work( activity );
-				
+				if ((activity < 1 && !this.day.includes( getLocaleDate().getHours() )) || (activity < 1 && !(this.day.includes( getLocaleDate().getHours() ) && this.getChance( 10 )))) {
+					return this.workRetry( 'activity '.red() + activity );
+				}
 			} else {
-				activity <= 6 ?
-					this.workRetry( 'activity '.red() + activity ) : this.work( activity );
+				if (activity <= 6) {
+					return this.workRetry( 'activity '.red() + activity );
+				}
 			}
+			this.work( activity );
 		} );
 	}
 	
@@ -69,7 +72,7 @@ export default class workHandler {
 	 * @description Fetch /work
 	 */
 	work(activity) {
-		this.log( 'work | activity', activity );
+		this.log( 'work', activity.toString().green() );
 		
 		fetch( 'https://discord.com/api/v9/interactions', {
 			'headers': {
@@ -220,5 +223,13 @@ export default class workHandler {
 	 */
 	getSecs(milliseconds) {
 		return (milliseconds / config.one_second).toFixed( 0 );
+	}
+	
+	/**
+	 * @name getHours
+	 * @description Transform milliseconds to hours
+	 */
+	getChance(percent) {
+		return Math.random() <= percent / 100;
 	}
 }
