@@ -54,8 +54,11 @@ export default class workHandler {
 		getActivity( this.id, this.authorization ).then( activity => {
 			
 			if (!this.pay) {
-				if ((activity < 1 && !this.day.includes( getLocaleDate().getHours() )) || (activity < 1 && !(this.day.includes( getLocaleDate().getHours() ) && this.getChance( 40 )))) {
-					return this.workRetry( 'activity '.red() + activity );
+				if (activity < 1) {
+					if (!this.day.includes( getLocaleDate().getHours() ) || (this.day.includes( getLocaleDate().getHours() ) && this.getChance( 40 ))) {
+						return this.workRetry( 'activity '.red() + activity );
+					}
+					
 				} else if (!(!this.day.includes( getLocaleDate().getHours() ) && this.getChance( 5 ))) {
 					return this.workRetry( 'activity '.red() + activity );
 				}
