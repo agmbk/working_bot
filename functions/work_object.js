@@ -109,7 +109,6 @@ export default class workHandler {
 	 * @description Fetch money gain from work
 	 */
 	getMoney() {
-		this.log( 'getMoney' );
 		
 		/** Fetch money gain */
 		fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {

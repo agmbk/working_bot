@@ -7,8 +7,8 @@
   "one_minute": 6e4,
   "one_second": 1e3,
   "pay_interval": 1512e6,
-  "work_interval": 3.6e6,
-  "cant_c_me": 1e6,
+  "work_interval": 4e6,
+  "cant_c_me": 9e5,
   "retry": 6e5,
   "timezone_offset": -120,
   "night": [
