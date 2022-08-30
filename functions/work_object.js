@@ -53,21 +53,18 @@ export default class workHandler {
 	workActivity() {
 		getActivity( this.id, this.authorization ).then( activity => {
 			
-			if (!this.pay) {
-				if (activity < 1) {
-					if (!(this.day.includes( getLocaleDate().getHours() ) && this.getChance( 40 ))) {
-						return this.workRetry( 'activity '.red() + activity );
-					} else if (!(!this.day.includes( getLocaleDate().getHours() ) && this.getChance( 5 ))) {
-						return this.workRetry( 'activity '.red() + activity );
-					}
-				}
-			} else {
+			if (this.pay) {
 				if (activity < 6) {
 					return this.workRetry( 'activity '.red() + activity );
 				}
+			} else {
+				if (activity < 1) {
+					if (!(this.day.includes( getLocaleDate().getHours() ) && this.getChance( 40 )) || !(!this.day.includes( getLocaleDate().getHours() ) && this.getChance( 5 ))) {
+						return this.workRetry( 'activity '.red() + activity );
+					}
+				}
 			}
 			this.work( activity );
-			
 		} );
 	}
 	
@@ -137,7 +134,7 @@ export default class workHandler {
 				if (message.author.id === '952125649345196044' && message.interaction.user.id === this.id && message.interaction.name === 'work') {
 					const money_mess_date = new Date( message.timestamp );
 					money_mess_date.setMilliseconds( 0 );
-					this.log( `Money message ${money_mess_date === this.data.date} ${getLocaleDateString( money_mess_date ).cyan()} | Last in DB ${getLocaleDateString( this.data.date ).cyan()} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
+					// this.log( `Money message ${money_mess_date === this.data.date} ${getLocaleDateString( money_mess_date ).cyan()} | Last in DB ${getLocaleDateString( this.data.date ).cyan()} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
 					
 					if /** Work is a success */ (money_mess_date > this.data.date) {
 						

@@ -11,7 +11,6 @@ import database from '../data/database.js';
  * @returns {void}
  */
 export default async function saveData(data, id, date) {
-	console.log( 'saveData'.green() );
 	try {
 		const query = `
             UPDATE ${config.table}
