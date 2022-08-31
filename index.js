@@ -4,7 +4,8 @@ import accounts from './data/accounts.js';
 import mainAccount from './data/mainAccount.js';
 import pay from './functions/pay.js';
 import './data/color.js';
-import workHandler from './functions/work_object.js';
+import workHandler from './functions/work.js';
+import { getLocaleDate } from './functions/dateHandler.js';
 
 
 try {
@@ -18,9 +19,9 @@ try {
 	
 	/** Pay */
 	accounts.map( account => {
-		if (account.pay) {
+		if (account.pay && Math.random() < 0.2 && !config.night.includes( getLocaleDate().getHours() )) {
 			console.log( `${account.id.cyan()} is paying ${mainAccount.id.cyan()}` );
-			setTimeout( () => pay( account, mainAccount ), config.pay_interval );
+			setTimeout( () => pay( account, mainAccount ), config.one_hour );
 		}
 	} );
 	

@@ -1,80 +1,85 @@
 import config from '../config.json' assert { type: 'json' };
 import fetch from 'node-fetch';
-import mainAccount from '../data/mainAccount.js';
-import { getLocaleDate, getLocaleDateString } from './dateHandler.js';
-import saveData from './saveData.js';
-import fetchResFormat from './fetchResFormat.js';
+import { getLocaleDate, getLocaleDateString, isCurrentDay } from './dateHandler.js';
 import getActivity from './getActivity.js';
+import fetchResFormat from './fetchResFormat.js';
+import saveData from './saveData.js';
+import '../data/color.js';
 
-/**
- * @name work
- * @description Work timeout executor
- *
- * @param {Object} account account
- * @param {Object} data data corresponding to the account
- * @param {int} timeout time in milliseconds to wait before working
- * @returns {void}
- */
-export async function work_cant_c_me(account, data, timeout) {
-	timeout += config.cant_c_me * Math.random();
-	let working_at = new Date();
-	working_at.setMilliseconds( working_at.getMilliseconds() + timeout );
-	console.log( account.id.toString().cyan(), 'Working at', getLocaleDateString( working_at ).green(), 'in', (timeout / config.one_minute).toFixed( 0 ).green(), 'mins' );
-	await new Promise( resolve => setTimeout( resolve, timeout ) );
-	return work( account, data );
-}
 
-/**
- * @name work
- * @description Work if channel is active, fetch gain and save it into the DB, every work_interval
- *
- * @param {Object} account account
- * @param {Object} data data corresponding to the account
- * @returns {void}
- */
-export default async function work(account, data) {
+export default class workHandler {
+	day = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0];
+	retryCount = 0;
+	retryTimeout;
 	
-	let date = getLocaleDate();
-	const hours = date.getHours();
+	constructor(account, data) {
+		this.data = data;
+		this.authorization = account.authorization;
+		this.pay = account.pay;
+		this.id = account.id;
+		this.session_id = account.session_id;
+		this.startup();
+	}
 	
-	console.log( 'Hours', config.night.at( -1 ) - getLocaleDate().getHours() );
-	if (config.night.includes( getLocaleDate().getHours() )) {
-		console.log( 'Its the night'.red() );
-		if (hours > config.night.at( -1 ) && hours >= config.night[0]) {
-			const difference = 24 - hours + config.night.at( -1 );
-			date.setHours( date.getHours() + difference );
-			date.setMinutes( 0 );
-			date.setSeconds( 0 );
-			const working_date = getLocaleDateString( new Date().getTime() + date );
-			const timeout = date - getLocaleDate();
-			console.log( 'Night will end in', difference, 'hours. Waking at', working_date, timeout / config.one_hour );
-			await new Promise( resolve => setTimeout( resolve, timeout ) );
-		} else {
-			const difference = config.night.at( -1 ) - hours;
-			date.setHours( date.getHours() + difference );
-			date.setMinutes( 0 );
-			date.setSeconds( 0 );
-			const working_date = getLocaleDateString( new Date().getTime() + date );
-			const timeout = date - getLocaleDate();
-			console.log( 'Night will end in', difference, 'hours. Waking at', working_date, timeout / config.one_hour );
-			await new Promise( resolve => setTimeout( resolve, timeout ) );
+	/**
+	 * @name log
+	 * @description Console log a string with the prefix of the account id
+	 */
+	log() {
+		const string = Object.values( arguments ).toString();
+		this.pay ? console.log( this.id.toString().cyan(), string ) : console.log( this.id.toString().yellow(), string );
+	}
+	
+	/**
+	 * @name startup
+	 * @description Init activity and handle errors
+	 */
+	startup() {
+		try {
+			this.log( 'successfully started'.green() );
+			const timeout = config.one_hour - (new Date() - this.data.date);
+			setTimeout( () => timeout > 0 ? this.wait( timeout, 'startup' ) : this.workActivity(), config.one_second * 3 );
 			
-			console.log( 'Night will end in', difference, 'hours. Waking at', getLocaleDateString( date ) );
-			await new Promise( resolve => setTimeout( resolve, timeout ) );
+		} catch (e) {
+			this.log( 'workHandler has crashed'.red(), e );
+			this.startup();
 		}
-		//return;
 	}
 	
-	if (!(await work_activity( account ))) {
-		return work_retry( account, data );
+	/**
+	 * @name workActivity
+	 * @description Start working according to the activity
+	 */
+	workActivity() {
+		getActivity( this.id, this.authorization ).then( activity => {
+			
+			if (this.pay) {
+				if (activity < 6) {
+					return this.workRetry( 'activity '.red() + activity );
+				}
+			} else {
+				if (activity < 1) {
+					if (!(this.day.includes( getLocaleDate().getHours() ) && this.getChance( 40 )) || !(!this.day.includes( getLocaleDate().getHours() ) && this.getChance( 5 ))) {
+						return this.workRetry( 'activity '.red() + activity );
+					}
+				}
+			}
+			this.work( activity );
+		} );
 	}
 	
-	try {
-		await fetch( 'https://discord.com/api/v9/interactions', {
+	/**
+	 * @name work
+	 * @description Fetch /work
+	 */
+	work(activity) {
+		this.log( 'work', activity.toString().green() );
+		
+		fetch( 'https://discord.com/api/v9/interactions', {
 			'headers': {
 				'accept': '*/*',
 				'accept-language': 'fr,fr-FR;q=0.9',
-				'authorization': account.authorization,
+				'authorization': this.authorization,
 				'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryMcqN0DmNbQHonseA',
 				'sec-fetch-dest': 'empty',
 				'sec-fetch-mode': 'cors',
@@ -87,160 +92,143 @@ export default async function work(account, data) {
 			},
 			'referrer': `https://discord.com/channels/902947280162811975/905426507021811772`,
 			'referrerPolicy': 'strict-origin-when-cross-origin',
-			'body': `------WebKitFormBoundaryMcqN0DmNbQHonseA\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n\r\n{\"type\":2,\"application_id\":\"952125649345196044\",\"guild_id\":\"902947280162811975\",\"channel_id\":\"905426507021811772\",\"session_id\":\"${account.session_id}\",\"data\":{\"version\":\"1001148798988472382\",\"id\":\"1001148798988472381\",\"guild_id\":\"902947280162811975\",\"name\":\"work\",\"type\":1,\"options\":[],\"attachments\":[]},\"nonce\":\"1010702591710986240\"}\r\n------WebKitFormBoundaryMcqN0DmNbQHonseA--\r\n`,
+			'body': `------WebKitFormBoundaryMcqN0DmNbQHonseA\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n\r\n{\"type\":2,\"application_id\":\"952125649345196044\",\"guild_id\":\"902947280162811975\",\"channel_id\":\"905426507021811772\",\"session_id\":\"${this.session_id}\",\"data\":{\"version\":\"1001148798988472382\",\"id\":\"1001148798988472381\",\"guild_id\":\"902947280162811975\",\"name\":\"work\",\"type\":1,\"options\":[],\"attachments\":[]},\"nonce\":\"1010702591710986240\"}\r\n------WebKitFormBoundaryMcqN0DmNbQHonseA--\r\n`,
 			'method': 'POST',
 			'mode': 'cors',
 		} ).then( async res => {
-			
-			let money = 0;
-			let money_mess_date;
 			if (res.ok) {
-				data.count += 1;
-				data.count_total += 1;
-				
-				/** Fetch money gain */
-				await new Promise( resolve => setTimeout( resolve, config.one_second * 5 ) );
-				money = await fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {
-					'headers': {
-						'accept': '*/*',
-						'accept-language': 'fr,fr-FR;q=0.9',
-						'authorization': account.authorization,
-						'sec-fetch-dest': 'empty',
-						'sec-fetch-mode': 'cors',
-						'sec-fetch-site': 'same-origin',
-						'x-debug-options': 'bugReporterEnabled',
-						'x-discord-locale': 'en-GB',
-					},
-					'referrer': 'https://discord.com/channels/902947280162811975/952558030556389466',
-					'referrerPolicy': 'strict-origin-when-cross-origin',
-					'body': null,
-					'method': 'GET',
-					'mode': 'cors',
-				} ).then( res => res.json().then( json => {
-					
-					/** Get the last message > DB date */
-					for (const message of json) {
-						if (message.author.id === '952125649345196044' && message.interaction.user.id === account.id && message.interaction.name === 'work') {
-							money_mess_date = new Date( message.timestamp );
-							money_mess_date.setMilliseconds( 0 );
-							console.log( `Money message ${money_mess_date === data.date} ${getLocaleDateString( money_mess_date ).cyan()}, UTC ${money_mess_date.getTime()} | Last in DB ${getLocaleDateString( data.date ).cyan()}, UTC ${data.date.getTime()} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
-							if (money_mess_date > data.date) {
-								return parseInt( message.content.split( '**' )[1] );
-							} else if (money_mess_date === data.date) return money_mess_date;
-						}
-					}
-					return 0;
-					
-				} ) );
+				setTimeout( () => this.getMoney(), config.one_second * 5 );
+			} else {
+				this.workRetry( '/work failed '.red() + fetchResFormat( res ) );
 			}
-			return work_done( account, data, money, money_mess_date, res );
 		} );
-	} catch (e) {
-		console.error( 'Work has crashed'.red(), e );
-		data.error += 1;
-		return work_retry( account, data );
 	}
 	
-}
-
-
-/**
- * @name work_retry
- * @description Work retry executor
- *
- * @param {Object} account account
- * @param {Object} data data corresponding to the account
- * @returns {void}
- */
-async function work_retry(account, data) {
-	const timeout = config.retry;
-	console.log( 'retry', timeout / config.one_minute, 'mins' );
-	await new Promise( resolve => setTimeout( resolve, timeout ) );
-	return work( account, data );
-}
-
-
-/**
- * @name work_activity
- * @description Work activity
- *
- * @param {Object} account account
- * @returns {boolean} True if channel as enough activity
- */
-async function work_activity(account) {
-	const activity = await getActivity( account );
-	
-	/* Work less at night
-	 const currentHours = getLocaleDate().getHours();
-	 if (config.night.includes( currentHours )) {
-	 console.log( `It's the night` );
-	 
-	 if (account.id !== mainAccount.id) {
-	 // let date = new Date(Date.parse(getLocaleDate()))
-	 // date.setHours(date.getHours() + (config.night.at(-1) - currentHours))
-	 // timeout = Date.parse(getLocaleDate())  + config.cooldown * Math.random();
-	 timeout = config.work_interval + config.cooldown * Math.random();
-	 return work( account, data, timeout );
-	 } else if (Math.random() > 0.1) {
-	 const timeout = config.work_interval + config.cooldown * Math.random();
-	 return work( account, data, timeout );
-	 }
-	 }
+	/**
+	 * @name getMoney
+	 * @description Fetch money gain from work
 	 */
-	
-	if /** Main account */ (account.id === mainAccount.id) {
-		if (activity < 1) {
-			if (Math.random() < 0.9) {
-				console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting... | Date:', getLocaleDateString() );
-				return false;
-			}
-		}
+	getMoney() {
 		
-	} else /** Secondary accounts */{
-		if (activity <= 6) {
-			console.log( account.id.toString().cyan(), 'activity'.red(), activity, 'waiting...| Date:', getLocaleDateString() );
-			return false;
+		/** Fetch money gain */
+		fetch( `https://discord.com/api/v9/channels/905426507021811772/messages?limit=10`, {
+			'headers': {
+				'accept': '*/*',
+				'accept-language': 'fr,fr-FR;q=0.9',
+				'authorization': this.authorization,
+				'sec-fetch-dest': 'empty',
+				'sec-fetch-mode': 'cors',
+				'sec-fetch-site': 'same-origin',
+				'x-debug-options': 'bugReporterEnabled',
+				'x-discord-locale': 'en-GB',
+			},
+			'referrer': 'https://discord.com/channels/902947280162811975/952558030556389466',
+			'referrerPolicy': 'strict-origin-when-cross-origin',
+			'body': null,
+			'method': 'GET',
+			'mode': 'cors',
+		} ).then( res => res.json().then( json => {
+			
+			/** Get the last message > DB date */
+			for (const message of json) {
+				if (message.author.id === '952125649345196044' && message.interaction.user.id === this.id && message.interaction.name === 'work') {
+					const money_mess_date = new Date( message.timestamp );
+					money_mess_date.setMilliseconds( 0 );
+					// this.log( `Money message ${money_mess_date === this.data.date} ${getLocaleDateString( money_mess_date ).cyan()} | Last in DB ${getLocaleDateString( this.data.date ).cyan()} | Gain : ${parseInt( message.content.split( '**' )[1] )} | Date : ${getLocaleDateString()}` );
+					
+					if /** Work is a success */ (money_mess_date > this.data.date) {
+						
+						this.isNewDay();
+						const money = parseInt( message.content.split( '**' )[1] );
+						this.data.count += 1;
+						this.data.count_total += 1;
+						this.data.money_total += money;
+						this.data.money += money;
+						this.data.date = money_mess_date;
+						saveData( this.data, this.id, money_mess_date );
+						return this.wait( config.work_interval + config.cooldown, `Money: ${this.data.money.toString().blue()} | Mean: ${this.data.money_mean} | Gain: ${money.toString().green()} | Count: ${this.data.count}` );
+						
+					} else if /** Work has already been done */ (money_mess_date === this.data.date) {
+						
+						const timeout = 60 - (new Date() - money_mess_date);
+						return this.wait( timeout, 'the work has already been done' );
+						
+					} else /** Work failed */ {
+						
+						this.data.error += 1;
+						return this.workRetry( `Gain not found | Error: ${this.data.error}`.red() );
+					}
+				}
+			}
+		} ) );
+	}
+	
+	/**
+	 * @name workRetry
+	 * @description Retry working after a timeout
+	 */
+	workRetry(string) {
+		this.retryCount++;
+		this.retryCount >= 6 ? this.retryTimeout = config.one_hour : this.retryTimeout = config.retry;
+		this.wait( this.retryTimeout, `retry ${this.retryCount} ${this.retryTimeout} | ` + string );
+	}
+	
+	/**
+	 * @name isNewDay
+	 * @description Calculate data means and reset some data each new day
+	 */
+	isNewDay() {
+		if (isCurrentDay( this.data.date )) {
+			this.log( 'new day'.red() );
+			this.data.total_days_count += 1;
+			this.data.count_mean += ((this.data.count - this.data.count_mean) / this.data.total_days_count);
+			this.data.money_mean += ((this.data.money - this.data.money_mean) / this.data.total_days_count);
+			this.data.money = 0;
+			this.data.count = 0;
 		}
 	}
-	console.log( account.id.toString().cyan(), 'activity'.cyan(), activity );
-	return true;
-}
-
-/**
- * @name work_done
- * @description Work result handler
- *
- * @param {Object} account account
- * @param {Object} data data corresponding to the account
- * @param {number} money
- * @param {Date} money_mess_date
- * @param {Object} res
- * @returns {void}
- */
-async function work_done(account, data, money, money_mess_date, res) {
 	
-	if /** Has already worked */ (money instanceof Date) {
-		const timeout = 60 - (new Date() - money_mess_date) / config.one_minute;
-		console.log( account.id.red(), 'has already worked, waiting', timeout.toFixed( 0 ), 'mins' );
-		return work_cant_c_me( account, data, timeout * config.one_minute );
-		
-	} else if /** Work successes */ (money && res.ok && money_mess_date) {
-		
-		/** Calculate mean of the day */
-		
-		data.date = money_mess_date;
-		data.money_total += money;
-		data.money += money;
-		
-		console.log( `${account.id.green()} | Money: ${data.money.toString().blue()} | Mean: ${data.money_mean} | Gain: ${money.toString().green()} | Count: ${data.count} | Date: ${money_mess_date}` );
-		
-		const timeout = config.work_interval + config.cooldown * Math.random();
-		await saveData( data, account.id, money_mess_date );
-		return work_cant_c_me( account, data, timeout );
-		
-	} else /** Work failed */ {
-		console.warn( `${account.id.red()} failed ( ${fetchResFormat( res )} | Gain: ${money === 0 ? money.toString().red() : money.toString().green()} | Error: ${data.error} | Date: ${getLocaleDateString()} )` );
-		data.error += 1;
-		return work_retry( account, data );
+	/**
+	 * @name wait
+	 * @description Waits a certain amount of time, then works
+	 */
+	wait(timeout, reason) {
+		timeout += config.cant_c_me * Math.random();
+		let working_at = new Date();
+		working_at.setMilliseconds( working_at.getMilliseconds() + timeout );
+		this.log( `waiting ${this.getMins( timeout ).toString().cyan()} mins until ${getLocaleDateString( working_at ).cyan()} | ${reason} | Date : ${getLocaleDateString()}` );
+		setTimeout( () => this.workActivity(), timeout );
+	}
+	
+	/**
+	 * @name getHours
+	 * @description Transform milliseconds to hours
+	 */
+	getHours(milliseconds) {
+		return (milliseconds / config.one_hour).toFixed( 0 );
+	}
+	
+	/**
+	 * @name getHours
+	 * @description Transform milliseconds to minutes
+	 */
+	getMins(milliseconds) {
+		return (milliseconds / config.one_minute).toFixed( 0 );
+	}
+	
+	/**
+	 * @name getHours
+	 * @description Transform milliseconds to secondes
+	 */
+	getSecs(milliseconds) {
+		return (milliseconds / config.one_second).toFixed( 0 );
+	}
+	
+	/**
+	 * @name getHours
+	 * @description Transform milliseconds to hours
+	 */
+	getChance(percent) {
+		return Math.random() <= percent / 100;
 	}
 }
