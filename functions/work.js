@@ -6,8 +6,17 @@ import fetchResFormat from './fetchResFormat.js';
 import saveData from './saveData.js';
 import '../data/color.js';
 
-
-export default class workHandler {
+/**
+ * @author 🅣 🅞 🅚 🅐#9652
+ * @class
+ * @name WorkHandler
+ * @export WorkHandler
+ * @description Start a working instance for a given account
+ *
+ * @param account
+ * @param data
+ */
+export default class WorkHandler {
 	day = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0];
 	retryCount = 0;
 	retryTimeout;
@@ -41,7 +50,7 @@ export default class workHandler {
 			setTimeout( () => timeout > 0 ? this.wait( timeout, 'startup' ) : this.workActivity(), config.one_second * 3 );
 			
 		} catch (e) {
-			this.log( 'workHandler has crashed'.red(), e );
+			this.log( 'WorkHandler has crashed'.red(), e );
 			this.startup();
 		}
 	}
@@ -170,7 +179,7 @@ export default class workHandler {
 	workRetry(string) {
 		this.retryCount++;
 		this.retryCount >= 6 ? this.retryTimeout = config.one_hour : this.retryTimeout = config.retry;
-		this.wait( this.retryTimeout, `retry ${this.retryCount} ${this.retryTimeout} | ` + string );
+		this.wait( this.retryTimeout, string );
 	}
 	
 	/**
@@ -179,7 +188,6 @@ export default class workHandler {
 	 */
 	isNewDay() {
 		if (isCurrentDay( this.data.date )) {
-			this.log( 'new day'.red() );
 			this.data.total_days_count += 1;
 			this.data.count_mean += ((this.data.count - this.data.count_mean) / this.data.total_days_count);
 			this.data.money_mean += ((this.data.money - this.data.money_mean) / this.data.total_days_count);

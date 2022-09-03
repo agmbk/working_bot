@@ -4,7 +4,7 @@ import accounts from './data/accounts.js';
 import mainAccount from './data/mainAccount.js';
 import pay from './functions/pay.js';
 import './data/color.js';
-import workHandler from './functions/work.js';
+import WorkHandler from './functions/work.js';
 import { getLocaleDate } from './functions/dateHandler.js';
 
 
@@ -27,7 +27,7 @@ try {
 	
 	/** Work */
 	accounts.map( async (account, id) => {
-		new workHandler( account, data[id] );
+		new WorkHandler( account, data[id] );
 	} );
 	
 	setTimeout( () => console.log( '*** Work result ***'.blue() ), 0 );
