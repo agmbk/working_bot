@@ -17,7 +17,7 @@ import '../data/color.js';
  * @param data
  */
 export default class WorkHandler {
-	day = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0];
+	day = [ 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0];
 	retryCount = 0;
 	retryTimeout;
 	
@@ -63,7 +63,7 @@ export default class WorkHandler {
 		getActivity( this.id, this.authorization ).then( activity => {
 			
 			if (this.pay) {
-				if (activity < 6) {
+				if (activity < 6 || !this.day.includes( getLocaleDate().getHours() ) && this.getChance( 40 )) {
 					return this.workRetry( 'activity '.red() + activity );
 				}
 			} else {

@@ -10,7 +10,6 @@
   "work_interval": 4e6,
   "cant_c_me": 9e5,
   "retry": 6e5,
-  "timezone_offset": -120,
   "night": [
     22,
     23,
