@@ -63,7 +63,7 @@ export default class WorkHandler {
 		getActivity( this.id, this.authorization ).then( activity => {
 			
 			if (this.pay) {
-				if (activity < 6 || !this.day.includes( getLocaleDate().getHours() ) && this.getChance( 40 )) {
+				if (activity < 6 && this.day.includes( getLocaleDate().getHours() ) || !this.day.includes( getLocaleDate().getHours() ) && this.getChance( 40 )) {
 					return this.workRetry( 'activity '.red() + activity );
 				}
 			} else {
