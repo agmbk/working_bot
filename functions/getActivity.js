@@ -32,7 +32,8 @@ export default function getActivity(id, authorization) {
 		let activity = 0;
 		
 		for (const message of json) {
-			if (message.author.id === '952125649345196044' && message.interaction.user.id === id && message.interaction.name === 'work') {
+			console.log( message );
+			if (message.author.id === '952125649345196044' && message.interaction?.user.id === id && message.interaction?.name === 'work') {
 				return activity;
 				
 			} else if (!workers.includes( message.author.id ) && !(message.author.id === '952125649345196044' && workers.includes( message.interaction.user.id ))) {
