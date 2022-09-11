@@ -8,7 +8,7 @@
   "one_second": 1e3,
   "pay_interval": 1512e6,
   "work_interval": 4e6,
-  "cant_c_me": 9e5,
+  "cant_c_me": 4e5,
   "retry": 6e5,
   "night": [
     22,
