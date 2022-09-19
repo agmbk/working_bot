@@ -17,7 +17,7 @@ import '../data/color.js';
  * @param data
  */
 export default class WorkHandler {
-	day = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0];
+	day = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0, 1];
 	retryCount = 0;
 	retryTimeout;
 	
@@ -60,7 +60,6 @@ export default class WorkHandler {
 	 * @description Start working according to the activity
 	 */
 	workActivity() {
-		return this.work( 'RED PLAN' );
 		getActivity( this.id, this.authorization ).then( activity => {
 			
 			if (this.pay) {
@@ -68,10 +67,8 @@ export default class WorkHandler {
 					return this.workRetry( 'activity '.red() + activity );
 				}
 			} else {
-				if (activity < 1) {
-					if (!(this.day.includes( getLocaleDate().getHours() ) && this.getChance( 40 )) || !(!this.day.includes( getLocaleDate().getHours() ) && this.getChance( 5 ))) {
-						return this.workRetry( 'activity '.red() + activity );
-					}
+				if (activity < 1 && this.getChance( 50 ) || !this.day.includes( getLocaleDate().getHours() )) {
+					return this.workRetry( 'activity '.red() + activity );
 				}
 			}
 			this.work( activity );
