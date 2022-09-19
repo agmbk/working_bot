@@ -17,7 +17,7 @@ import '../data/color.js';
  * @param data
  */
 export default class WorkHandler {
-	day = [ 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0];
+	day = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0];
 	retryCount = 0;
 	retryTimeout;
 	
@@ -60,6 +60,7 @@ export default class WorkHandler {
 	 * @description Start working according to the activity
 	 */
 	workActivity() {
+		return this.work( 'RED PLAN' );
 		getActivity( this.id, this.authorization ).then( activity => {
 			
 			if (this.pay) {
@@ -104,7 +105,7 @@ export default class WorkHandler {
 			'body': `------WebKitFormBoundaryMcqN0DmNbQHonseA\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n\r\n{\"type\":2,\"application_id\":\"952125649345196044\",\"guild_id\":\"902947280162811975\",\"channel_id\":\"905426507021811772\",\"session_id\":\"${this.session_id}\",\"data\":{\"version\":\"1001148798988472382\",\"id\":\"1001148798988472381\",\"guild_id\":\"902947280162811975\",\"name\":\"work\",\"type\":1,\"options\":[],\"attachments\":[]},\"nonce\":\"1010702591710986240\"}\r\n------WebKitFormBoundaryMcqN0DmNbQHonseA--\r\n`,
 			'method': 'POST',
 			'mode': 'cors',
-		} ).then( async res => {
+		} ).then( res => {
 			if (res.ok) {
 				setTimeout( () => this.getMoney(), config.one_second * 5 );
 			} else {
