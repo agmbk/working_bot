@@ -1,6 +1,6 @@
-import config from '../config.json' assert { type: 'json' };
+import config from '../config.json' assert {type: 'json'};
 import fetch from 'node-fetch';
-import { getLocaleDate, getLocaleDateString, isCurrentDay } from './dateHandler.js';
+import {getLocaleDate, getLocaleDateString, isCurrentDay} from './dateHandler.js';
 import getActivity from './getActivity.js';
 import fetchResFormat from './fetchResFormat.js';
 import saveData from './saveData.js';
@@ -67,8 +67,8 @@ export default class WorkHandler {
 					return this.workRetry( 'activity '.red() + activity );
 				}
 			} else {
-				if (activity < 1 && this.getChance( 50 ) || !this.day.includes( getLocaleDate().getHours() )) {
-					return this.workRetry( 'activity '.red() + activity );
+				if (activity < 1 && this.getChance(70) || !this.day.includes(getLocaleDate().getHours())) {
+					return this.workRetry('activity '.red() + activity);
 				}
 			}
 			this.work( activity );
