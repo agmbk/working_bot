@@ -1,3 +1,4 @@
+process.env.TZ = 'Europe/Paris';
 import data from './data/databaseData.js';
 import accounts from './data/accounts.js';
 import mainAccount from './data/mainAccount.js';
