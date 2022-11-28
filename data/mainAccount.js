@@ -1,4 +1,4 @@
-import accounts from './accounts.js';
+const accounts = require('./accounts.js');
 
 
-export default accounts.find( account => account.pay === false );
+module.exports = accounts.find(account => account.pay === false);

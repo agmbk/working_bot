@@ -1,0 +1,13 @@
+{
+  "apps": [
+    {
+      "name": "working_bot",
+      "script": "npm start",
+      "restart_delay": 1000,
+      "max_memory_restart": "1500M",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}

@@ -2,20 +2,23 @@
   "name": "working_bot",
   "version": "1.0.0",
   "description": "A bot that works for me",
-  "main": "index.js",
+  "main": "working_bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "forever --minUptime 1000 --spinSleepTime 1000 index.js"
+    "start": "node working_bot.js"
   },
   "author": "Toka",
   "license": "ISC",
   "dependencies": {
     "chalk": "^5.0.1",
     "dotenv": "^16.0.1",
-    "forever": "^4.0.3",
-    "node-fetch": "^3.2.10",
+    "javascript-obfuscator": "^4.0.0",
+    "node-fetch": "^2.6.7",
     "pg": "^8.7.3",
-    "url-parse": "^1.5.10"
+    "simple-ssh": "^1.1.0",
+    "ssh2-sftp-client": "^9.0.4",
+    "webpack": "^5.75.0",
+    "webpack-node-externals": "^3.0.0"
   },
-  "type": "module"
+  "type": "commonjs"
 }

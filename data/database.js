@@ -1,20 +1,12 @@
-import PG from 'pg';
-import parse from 'url-parse';
-import dotenv from 'dotenv';
+const PG = require('pg');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
-
-/* Get data credentials from url */
-const db = parse( process.env.DATABASE_URL );
-
-export default new PG.Client( {
-	user: db.username,
-	host: db.hostname,
-	database: db.pathname.slice( 1 ),
-	password: db.password,
-	port: db.port,
-	ssl: {
-		rejectUnauthorized: false,
-	},
-} );
+module.exports = new PG.Client({
+	host: '127.0.0.1',
+	port: '5432',
+	user: 'postgres',
+	password: 'SlZkclpsQXhRVXRRU1RJd2NUTjJNbGxLZGxsU1owbFdYbFJSZERkVFhrMUtjMDVMUmlWUVlYTlBOamhqT1hSQ0tqQjVTVGRIZUcxWVVGUmVNRTVwZFZKVmRyWmxBeFFVdFFTVEl3Y1ROMk1sbEtkbGxTWjBsV1hsUlJkRGRUWGsxS2MwNUxSaVZRWVhOUE5qaGpPWFJDS2pCNVNUZEhlRzFZVUZSZU1FNXBkVg',
+	database: 'working_bot'
+});

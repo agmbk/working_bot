@@ -75,4 +75,4 @@ String.prototype.grey = function () {
 };
 
 
-export default String;
+module.exports = String;

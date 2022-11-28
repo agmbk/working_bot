@@ -1,5 +1,5 @@
-import config from '../config.json' assert { type: 'json' };
-import database from '../data/database.js';
+const config = require('../config.json');
+const database = require('../data/database.js');
 
 /**
  * @name saveData
@@ -10,7 +10,7 @@ import database from '../data/database.js';
  * @param {Date} date last money message date
  * @returns {void}
  */
-export default async function saveData(data, id, date) {
+module.exports = async function saveData(data, id, date) {
 	try {
 		const query = `
             UPDATE ${config.table}
@@ -23,11 +23,10 @@ export default async function saveData(data, id, date) {
                 count_mean       = ${data.count_mean},
                 error            = ${data.error},
                 date             = '${date.toUTCString()}'
-            WHERE id = '${id}'
-		`;
-		await database.query( query );
+            WHERE id = '${id}'`;
+		await database.query(query);
 		
 	} catch (e) {
-		console.error( 'saveData has crashed'.red(), e );
+		console.error('saveData has crashed'.red(), e);
 	}
-}
+};
