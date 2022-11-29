@@ -2,8 +2,8 @@ module.exports = [
 	{
 		'id': '709388803546021960',
 		'pay': false,
-		'authorization': 'NzA5Mzg4ODAzNTQ2MDIxOTYw.G02AZ2.MgFCR5MaxpxyXNXe4Q8KiQcYq-qc-3javMDp8w',
-		'session_id': 'eeb3abd1350fa4d8e56a2deb746985a0'
+		'authorization': 'NzA5Mzg4ODAzNTQ2MDIxOTYw.GLIJgq.HXGkIONqYx1WRk9bj16ElqT9gcYHUkHN_Tt_G4',
+		'session_id': '072d229d1df3aaef4c485b92f47deabe'
 	}, {
 		'id': '923174638698237962',
 		'pay': true,

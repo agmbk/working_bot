@@ -62,7 +62,6 @@ module.exports = class WorkHandler {
 	 */
 	workActivity() {
 		getActivity(this.id, this.authorization).then(activity => {
-			
 			if (this.pay) {
 				if (activity < 6 && this.day.includes(getLocaleDate().getHours()) || !this.day.includes(getLocaleDate().getHours()) && this.getChance(40)) {
 					return this.workRetry('activity '.red() + activity);
@@ -86,23 +85,21 @@ module.exports = class WorkHandler {
 		fetch('https://discord.com/api/v9/interactions', {
 			'headers': {
 				'accept': '*/*',
-				'accept-language': 'fr,fr-FR;q=0.9',
+				'accept-language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
 				'authorization': this.authorization,
-				'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryMcqN0DmNbQHonseA',
+				'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary0N5zB8dsce5O8Lab',
 				'sec-fetch-dest': 'empty',
 				'sec-fetch-mode': 'cors',
 				'sec-fetch-site': 'same-origin',
 				'x-debug-options': 'bugReporterEnabled',
 				'x-discord-locale': 'en-GB',
-				'x-fingerprint': '1010702419111460874.LzvOdL3jTREmOoBLHZQudC-bGV4',
-				'x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiRGlzY29yZCBDbGllbnQiLCJyZWxlYXNlX2NoYW5uZWwiOiJzdGFibGUiLCJjbGllbnRfdmVyc2lvbiI6IjEuMC45MDA2Iiwib3NfdmVyc2lvbiI6IjEwLjAuMjIwMDAiLCJvc19hcmNoIjoieDY0Iiwic3lzdGVtX2xvY2FsZSI6ImZyIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTQyODY4LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==',
-				'cookie': '__dcfduid=0c095750eae211ec9277b769df24b26a; __sdcfduid=0c095751eae211ec9277b769df24b26a78e0361b8f672f8cf7c211b13c347439284eab11bde79ecf445cdd901eadf5ec; __stripe_mid=55cdba8e-92b0-496c-8851-3025451e30e60d8f68; locale=en-GB'
+				'x-super-properties': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImZyLUZSIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwNi4wLjUyNDkuMTE5IFNhZmFyaS81MzcuMzYiLCJicm93c2VyX3ZlcnNpb24iOiIxMDYuMC41MjQ5LjExOSIsIm9zX3ZlcnNpb24iOiIxMCIsInJlZmVycmVyIjoiIiwicmVmZXJyaW5nX2RvbWFpbiI6IiIsInJlZmVycmVyX2N1cnJlbnQiOiJodHRwczovL3d3dy55b3V0dWJlLmNvbS8iLCJyZWZlcnJpbmdfZG9tYWluX2N1cnJlbnQiOiJ3d3cueW91dHViZS5jb20iLCJyZWxlYXNlX2NoYW5uZWwiOiJzdGFibGUiLCJjbGllbnRfYnVpbGRfbnVtYmVyIjoxNjA2NDUsImNsaWVudF9ldmVudF9zb3VyY2UiOm51bGx9',
+				'cookie': '__dcfduid=dbadf91046ff11ed8f826dbaeacdbf67; __sdcfduid=dbadf91146ff11ed8f826dbaeacdbf6754d9b4d6e41fca9f89fca6f61ecbb5c6f43ea2ebd434c57a77bf18288b6ab492; __stripe_mid=f304ec95-7e45-4ce0-81cb-c1cd21b631a32958b7; locale=en-GB',
+				'Referer': 'https://discord.com/channels/902947280162811975/905426507021811772',
+				'Referrer-Policy': 'strict-origin-when-cross-origin'
 			},
-			'referrer': `https://discord.com/channels/902947280162811975/905426507021811772`,
-			'referrerPolicy': 'strict-origin-when-cross-origin',
-			'body': `------WebKitFormBoundaryMcqN0DmNbQHonseA\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n\r\n{\"type\":2,\"application_id\":\"952125649345196044\",\"guild_id\":\"902947280162811975\",\"channel_id\":\"905426507021811772\",\"session_id\":\"${this.session_id}\",\"data\":{\"version\":\"1001148798988472382\",\"id\":\"1001148798988472381\",\"guild_id\":\"902947280162811975\",\"name\":\"work\",\"type\":1,\"options\":[],\"attachments\":[]},\"nonce\":\"1010702591710986240\"}\r\n------WebKitFormBoundaryMcqN0DmNbQHonseA--\r\n`,
-			'method': 'POST',
-			'mode': 'cors'
+			'body': `------WebKitFormBoundary0N5zB8dsce5O8Lab\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n\r\n{\"type\":2,\"application_id\":\"952125649345196044\",\"guild_id\":\"902947280162811975\",\"channel_id\":\"905426507021811772\",\"session_id\":\"${this.session_id}\",\"data\":{\"version\":\"1001148798988472382\",\"id\":\"1001148798988472381\",\"guild_id\":\"902947280162811975\",\"name\":\"work\",\"type\":1,\"options\":[],\"attachments\":[]},\"nonce\":\"1046920100218667008\"}\r\n------WebKitFormBoundary0N5zB8dsce5O8Lab--\r\n`,
+			'method': 'POST'
 		}).then(res => {
 			if (res.ok) {
 				setTimeout(() => this.getMoney(), config.one_second * 5);
@@ -124,13 +121,14 @@ module.exports = class WorkHandler {
 				'accept': '*/*',
 				'accept-language': 'fr,fr-FR;q=0.9',
 				'authorization': this.authorization,
+				'content-type': 'multipart/form-data',
 				'sec-fetch-dest': 'empty',
 				'sec-fetch-mode': 'cors',
 				'sec-fetch-site': 'same-origin',
 				'x-debug-options': 'bugReporterEnabled',
 				'x-discord-locale': 'en-GB'
 			},
-			'referrer': 'https://discord.com/channels/902947280162811975/952558030556389466',
+			'referrer': 'https://discord.com/channels/902947280162811975/905426507021811772',
 			'referrerPolicy': 'strict-origin-when-cross-origin',
 			'body': null,
 			'method': 'GET',
